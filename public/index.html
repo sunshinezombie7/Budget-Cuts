@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BUDGET CUTS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Tinos:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Oswald:wght@700&family=Permanent+Marker&family=Special+Elite&family=Tinos:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* --- GLOBAL & BACKGROUND --- */
+        /* --- GLOBAL --- */
         body { 
-            font-family: 'Special Elite', 'Courier New', monospace; /* Typewriter font for UI */
-            /* Aged crumpled paper texture background */
+            font-family: 'Special Elite', monospace; /* Typewriter font for UI */
             background-color: #d8cba0;
             background-image: url('https://www.transparenttextures.com/patterns/crumpled-paper.png');
             text-align: center; 
@@ -18,72 +17,61 @@
             color: #333;
         }
         
-        /* --- HEADINGS --- */
         h1 { 
-            font-family: 'Tinos', serif; /* Newspaper headline font */
-            font-size: 3rem; 
+            font-family: 'Abril Fatface', cursive; /* Big Fancy Headline */
+            font-size: 3.5rem; 
+            letter-spacing: 2px;
+            color: #111;
             text-transform: uppercase; 
             display: inline-block; 
-            padding: 15px 30px; 
-            background: #f4f1e8; /* Off-white newspaper color */
+            padding: 10px 40px; 
+            background: #fff;
             /* Jagged cutout look */
-            clip-path: polygon(2% 8%, 98% 2%, 100% 92%, 95% 100%, 5% 98%, 0% 85%);
-            box-shadow: 10px 10px 20px rgba(0,0,0,0.5); /* Deep shadow */
-            transform: rotate(-2deg) skew(-2deg); 
-            border: none;
+            clip-path: polygon(3% 0%, 97% 5%, 100% 85%, 95% 100%, 5% 95%, 0% 10%);
+            box-shadow: 10px 10px 0 rgba(0,0,0,0.8); 
+            transform: rotate(-3deg); 
+            margin-bottom: 20px;
         }
         
         h3 {
-            background: #333;
-            color: #f4f1e8;
+            background: #111;
+            color: #fff;
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
             display: inline-block;
             padding: 5px 15px;
             transform: rotate(1deg);
-            box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+            box-shadow: 4px 4px 0 rgba(255,255,255,0.3);
         }
 
-        /* SCREENS */
         .screen { display: none; max-width: 900px; margin: 0 auto; }
         .active { display: block; }
 
-        /* --- THE MAGNETS (Cutout Clippings) --- */
+        /* --- THE MAGNETS (Dynamic styles applied via JS) --- */
         .magnet {
             display: inline-block;
-            /* Newspaper texture and color */
-            background-color: #fffdf0;
-            background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
-            color: #111;
-            font-family: 'Tinos', serif; /* Newspaper font */
-            font-weight: 700;
-            font-size: 1.2rem;
-            padding: 8px 15px;
-            margin: 8px;
+            padding: 5px 12px;
+            margin: 6px;
             cursor: grab;
             user-select: none;
-            /* The crucial "cutout" effect: Jagged edges + deep shadow */
-            clip-path: polygon(4% 0%, 96% 4%, 100% 90%, 94% 100%, 2% 96%, 0% 10%);
-            box-shadow: 6px 6px 12px rgba(0,0,0,0.4); /* Deep, soft shadow looks like it lifts off page */
+            box-shadow: 4px 4px 8px rgba(0,0,0,0.3);
             transition: transform 0.1s, box-shadow 0.1s;
-            border: none; /* Removed the solid border for the cutout look */
         }
         .magnet:hover { 
-            transform: scale(1.05) rotate(0deg) !important; /* Straighten up on hover */
-            box-shadow: 10px 10px 20px rgba(0,0,0,0.5); /* Lift higher */
-            background-color: #fffffa;
-            z-index: 10;
+            transform: scale(1.1) rotate(0deg) !important; 
+            z-index: 100;
+            box-shadow: 10px 10px 20px rgba(0,0,0,0.4);
         }
-        .magnet:active { cursor: grabbing; transform: scale(0.95); }
+        .magnet:active { cursor: grabbing; transform: scale(0.9); }
 
-        /* --- WORKSPACE CONTAINERS --- */
+        /* --- CONTAINERS --- */
         #corkboard {
-            /* Keep cork, add a "taped" frame look */
             background: url('https://www.transparenttextures.com/patterns/cork-board.png'), #a0522d;
-            border: 15px solid #d4c4a8; /* Masking tape color */
-            border-image: url('https://www.transparenttextures.com/patterns/crumpled-paper.png') 30 round;
-            padding: 30px;
-            min-height: 180px;
+            border: 15px solid #d4c4a8;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.7), 5px 5px 15px rgba(0,0,0,0.3);
+            padding: 40px;
+            min-height: 200px;
             margin-bottom: 30px;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.6), 5px 5px 15px rgba(0,0,0,0.3);
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
@@ -91,80 +79,64 @@
             gap: 15px;
             position: relative;
         }
-        /* Add "tape" to corners of corkboard */
-        #corkboard::before, #corkboard::after {
-            content: ''; position: absolute; width: 60px; height: 25px; background: rgba(255,255,255,0.4);
-            border: 1px dashed #999; transform: rotate(-45deg); box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-        }
-        #corkboard::before { top: -15px; left: -15px; }
-        #corkboard::after { bottom: -15px; right: -15px; }
-
 
         #wordBank {
-            /* Looks like a big manila folder area */
             background-color: #e8d8b8;
             background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');
             padding: 25px;
-            border: 4px dashed #b8a888;
+            border: 3px dashed #8c7b5d;
             min-height: 250px;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
             transform: rotate(0.5deg);
         }
 
         /* --- UI ELEMENTS --- */
-        /* Voting Cards look like index cards */
         .vote-card {
-            background: #fffdf0;
-            border: 1px solid #ccc;
-            margin: 15px auto;
-            padding: 20px;
+            background: #fff;
+            border: 1px solid #999;
+            margin: 20px auto;
+            padding: 25px;
             cursor: pointer;
-            box-shadow: 5px 5px 10px rgba(0,0,0,0.3);
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
             max-width: 700px;
             transform: rotate(-1deg);
             transition: all 0.2s;
         }
-        .vote-card:hover { background: #fff; transform: scale(1.02) rotate(0deg); box-shadow: 10px 10px 20px rgba(0,0,0,0.4); }
+        .vote-card:hover { transform: scale(1.02) rotate(1deg); border-color: #000; box-shadow: 10px 10px 20px rgba(0,0,0,0.3); }
 
-        /* Buttons look like stamped metal or thick plastic tags */
         button {
             padding: 15px 30px;
             font-size: 1.3rem;
-            font-family: 'Special Elite', monospace;
-            font-weight: bold;
-            background: #c43333; /* Red stamp color */
-            color: #f4f1e8;
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: #222;
+            color: #fff;
             border: none;
             cursor: pointer;
-            box-shadow: 5px 5px 0 #631a1a; /* Hard shadow */
+            box-shadow: 6px 6px 0 #999;
             transform: rotate(-1deg);
-            transition: all 0.1s;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            margin: 10px;
         }
-        button:hover { top: -2px; left: -2px; box-shadow: 7px 7px 0 #631a1a; background: #d64444; position: relative; }
-        button:active { top: 2px; left: 2px; box-shadow: 2px 2px 0 #631a1a; position: relative;}
+        button:hover { top: -2px; box-shadow: 8px 8px 0 #999; background: #000; position: relative; }
         
         input { 
             padding: 15px; font-size: 1.2rem; 
-            border: 3px solid #333; 
-            background: #f4f1e8; font-family: 'Special Elite', monospace;
-            box-shadow: inset 3px 3px 5px rgba(0,0,0,0.2);
+            border: 4px solid #111; 
+            background: #fff; font-family: 'Special Elite', monospace;
         }
         
-        .timer { font-size: 4rem; color: #c43333; font-family: 'Tinos', serif; font-weight: bold; margin: 10px 0; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .timer { font-size: 4rem; color: #d32f2f; font-family: 'Abril Fatface', cursive; margin: 10px 0; text-shadow: 2px 2px 0 #fff; }
         
-        /* Prompt box looks like a ripped piece of black paper */
         .prompt-box { 
-            background: #222; 
-            color: #f4f1e8; 
-            padding: 25px; 
-            font-size: 1.6rem; 
+            background: #111; 
+            color: #fff; 
+            padding: 20px; 
+            font-size: 1.5rem; 
+            font-family: 'Special Elite', monospace;
             margin: 0 auto 30px auto;
             max-width: 800px;
-            transform: rotate(1deg);
-            clip-path: polygon(2% 0%, 98% 3%, 100% 95%, 90% 100%, 5% 98%, 0% 85%);
-            box-shadow: 8px 8px 15px rgba(0,0,0,0.6);
+            clip-path: polygon(0% 0%, 100% 2%, 98% 100%, 2% 98%);
+            transform: rotate(-1deg);
         }
     </style>
 </head>
@@ -172,52 +144,105 @@
 
     <div id="lobbyScreen" class="screen active">
         <h1>BUDGET CUTS</h1>
+        <br>
+        <p style="font-size: 1.4rem; background:#fff; display:inline-block; padding:5px; transform:rotate(1deg);">
+            CORPORATE RANSOM GENERATOR
+        </p>
         <br><br>
-        <p style="font-size: 1.2rem;">ASSEMBLE YOUR RANSOM NOTE...</p>
-        <input type="text" id="username" placeholder="ENTER CODENAME">
+        <input type="text" id="username" placeholder="ENTER AGENT NAME">
         <br><br>
-        <button onclick="joinGame()">JOIN MISSION</button>
+        <button onclick="joinGame()">CLOCK IN</button>
         <br><br>
-        <h3>AGENTS IN LOBBY:</h3>
+        <h3>PENDING EMPLOYEES:</h3>
         <ul id="lobbyList" style="list-style: none; padding: 0;"></ul>
-        <button id="startBtn" onclick="startGame()" style="display:none; background:#5c8a5c; box-shadow: 5px 5px 0 #2e442e;">START OPERATION</button>
+        <button id="startBtn" onclick="startGame()" style="display:none; background:#2e7d32; box-shadow: 6px 6px 0 #1b5e20;">INITIATE LAYOFFS</button>
     </div>
 
     <div id="gameScreen" class="screen">
         <div class="timer" id="timer">90</div>
-        <div class="prompt-box" id="promptText">WAITING FOR TARGET...</div>
+        <div class="prompt-box" id="promptText">LOADING MEMO...</div>
         
-        <h3>YOUR RANSOM NOTE:</h3>
+        <h3>COMPOSE YOUR THREAT:</h3>
         <div id="corkboard">
-            <span style="color:rgba(255,255,255,0.7); font-style:italic; font-size: 1.2rem; background:rgba(0,0,0,0.3); padding: 5px;" id="emptyMsg">Click clipped words below to stick them here...</span>
+            <span style="color:rgba(255,255,255,0.7); font-style:italic; font-size: 1.2rem; background:rgba(0,0,0,0.5); padding: 5px;" id="emptyMsg">
+                Drag words here to construct your sentence...
+            </span>
         </div>
         
-        <button onclick="submitNote()" style="margin-bottom:25px;">SUBMIT THREAT</button>
+        <button onclick="submitNote()" style="margin-bottom:25px; background:#d32f2f; box-shadow: 6px 6px 0 #8b0000;">SUBMIT TO HR</button>
 
-        <h3>WORD CLIPPINGS:</h3>
+        <h3>AVAILABLE CLIPPINGS:</h3>
         <div id="wordBank"></div>
     </div>
 
     <div id="votingScreen" class="screen">
-        <h1>VOTE FOR THE BEST</h1>
+        <h1>PERFORMANCE REVIEW</h1>
         <div class="prompt-box" id="votePrompt"></div>
         <div id="submissionsList"></div>
     </div>
 
     <div id="resultScreen" class="screen">
-        <h1>WINNER!</h1>
-        <div class="prompt-box" id="winnerName" style="background:#eebb22; color:#000;"></div>
+        <h1>EMPLOYEE OF THE MONTH</h1>
+        <div class="prompt-box" id="winnerName" style="background:#fbc02d; color:#000;"></div>
         
-        <div id="winningNote" style="padding: 30px; background: url('https://www.transparenttextures.com/patterns/cork-board.png'), #a0522d; border: 10px solid #d4c4a8; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); margin: 30px auto; max-width: 700px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; min-height: 100px; align-items: center;"></div>
+        <div id="winningNote" style="padding: 40px; background: url('https://www.transparenttextures.com/patterns/cork-board.png'), #a0522d; border: 15px solid #d4c4a8; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); margin: 30px auto; max-width: 700px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; min-height: 150px; align-items: center;"></div>
         
-        <h3>SCORES</h3>
+        <h3>FINAL SCORES</h3>
         <ul id="scoreList" style="list-style: none; padding:0; font-size: 1.3rem;"></ul>
-        <button onclick="location.reload()">NEXT ROUND</button>
+        <button onclick="location.reload()">NEXT FISCAL YEAR</button>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        // --- THE JAVASCRIPT LOGIC (Unchanged from before) ---
+        // --- STYLE GENERATOR ---
+        // This function creates a specific "look" for every unique word.
+        // "Manager" will always look the same, "Refund" will always look the same.
+        function getWordStyle(word) {
+            let hash = 0;
+            for (let i = 0; i < word.length; i++) {
+                hash = word.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            
+            // The Palette of Styles (Newspaper, Magazine, Ransom, Coupon)
+            const styles = [
+                // 1. Classic News (Serif, White)
+                { bg: '#fdfbf7', color: '#111', font: "'Tinos', serif", weight: '400', trans: 'none', border: 'none' },
+                // 2. Magazine Headline (Bold, White, Caps)
+                { bg: '#ffffff', color: '#000', font: "'Oswald', sans-serif", weight: '700', trans: 'uppercase', border: 'none' },
+                // 3. Inverted Warning (Black, White Text)
+                { bg: '#111111', color: '#fdfbf7', font: "'Oswald', sans-serif", weight: '400', trans: 'uppercase', border: 'none' },
+                // 4. Tabloid Pink (Pink, Bold)
+                { bg: '#ff80ab', color: '#000', font: "'Oswald', sans-serif", weight: '700', trans: 'uppercase', border: 'none' },
+                // 5. Highlighter Yellow
+                { bg: '#ffeb3b', color: '#000', font: "'Special Elite', cursive", weight: '700', trans: 'none', border: '1px dashed #000' },
+                // 6. Blue Coupon
+                { bg: '#80d8ff', color: '#000', font: "'Tinos', serif", weight: '700', trans: 'none', border: '2px dotted #000' },
+                // 7. Red Alert
+                { bg: '#d32f2f', color: '#fff', font: "'Impact', sans-serif", weight: '400', trans: 'uppercase', border: 'none' }
+            ];
+
+            const index = Math.abs(hash) % styles.length;
+            const s = styles[index];
+            
+            // Random rotation (seeded by word hash + index so it's consistent)
+            const rot = (Math.abs(hash * 2) % 10) - 5; // -5 to +5 degrees
+            
+            // Random clip-path (jagged edges)
+            const clip = `polygon(${2+Math.abs(hash)%3}% ${0+Math.abs(hash)%4}%, ${96+Math.abs(hash)%3}% ${2+Math.abs(hash)%2}%, ${98+Math.abs(hash)%2}% ${95+Math.abs(hash)%3}%, ${2+Math.abs(hash)%2}% ${98+Math.abs(hash)%2}%)`;
+
+            return `
+                background:${s.bg}; 
+                color:${s.color}; 
+                font-family:${s.font}; 
+                font-weight:${s.weight}; 
+                text-transform:${s.trans}; 
+                border:${s.border};
+                transform: rotate(${rot}deg);
+                clip-path: ${clip};
+            `;
+        }
+
+        // --- GAME LOGIC ---
         const socket = io();
         let myHand = [];
         let myNote = [];
@@ -239,8 +264,7 @@
             list.innerHTML = '';
             Object.values(data.players).forEach(p => {
                 const li = document.createElement('li');
-                // Added a little paper tag look to list items
-                li.innerHTML = `<span style="background:#f4f1e8; padding: 5px 10px; border: 2px solid #333; transform: rotate(-1deg); display:inline-block;">${p.name} ${p.submission ? '(READY)' : ''}</span>`;
+                li.innerHTML = `<span style="background:#fff; font-family:'Permanent Marker'; padding: 5px 15px; border: 2px solid #333; transform: rotate(${Math.random()*4-2}deg); display:inline-block; font-size:1.4rem;">${p.name} ${p.submission ? '✅' : ''}</span>`;
                 li.style.margin = '10px 0';
                 list.appendChild(li);
             });
@@ -273,8 +297,8 @@
                 const span = document.createElement('span');
                 span.className = 'magnet';
                 span.textContent = word;
-                // Increased rotation range for messier look
-                span.style.transform = `rotate(${Math.random() * 16 - 8}deg)`;
+                span.style.cssText = getWordStyle(word); // APPLY THE STYLE!
+                
                 span.onclick = () => {
                     myHand.splice(index, 1);
                     myNote.push(word);
@@ -285,14 +309,14 @@
 
             // Draw Note (Board)
             if(myNote.length === 0) {
-                board.innerHTML = '<span style="color:rgba(255,255,255,0.7); font-style:italic; font-size: 1.2rem; background:rgba(0,0,0,0.3); padding: 5px;" id="emptyMsg">Click clipped words below to stick them here...</span>';
+                board.innerHTML = '<span style="color:rgba(255,255,255,0.7); font-style:italic; font-size: 1.2rem; background:rgba(0,0,0,0.5); padding: 5px;">Drag words here...</span>';
             } else {
                 myNote.forEach((word, index) => {
                     const span = document.createElement('span');
                     span.className = 'magnet';
                     span.textContent = word;
-                    // Increased rotation range
-                    span.style.transform = `rotate(${Math.random() * 16 - 8}deg)`;
+                    span.style.cssText = getWordStyle(word); // SAME STYLE!
+                    
                     span.onclick = () => {
                         myNote.splice(index, 1);
                         myHand.push(word);
@@ -306,7 +330,7 @@
         function submitNote() {
             if(myNote.length > 0) {
                 socket.emit('submitNote', myNote);
-                document.getElementById('corkboard').innerHTML = "<h2 style='background:#f4f1e8; padding:10px; border:3px solid #000; transform:rotate(-2deg); display:inline-block;'>THREAT SUBMITTED. AWAITING OTHERS...</h2>";
+                document.getElementById('corkboard').innerHTML = "<h2 style='background:#fff; padding:10px; border:3px solid #000; transform:rotate(-2deg); display:inline-block;'>SENT TO HR. PLEASE WAIT...</h2>";
                 document.getElementById('wordBank').style.display = 'none';
             }
         }
@@ -320,12 +344,15 @@
             submissions.forEach(sub => {
                 const div = document.createElement('div');
                 div.className = 'vote-card';
-                // Need to ensure magnets inside vote cards don't have huge shadows/rotation
-                div.innerHTML = sub.note.map(w => `<span class="magnet" style="box-shadow: 2px 2px 4px rgba(0,0,0,0.3); transform: rotate(${Math.random() * 6 - 3}deg); font-size: 1rem; padding: 5px 10px;">${w}</span>`).join(' ');
+                // Render the note using the same styles so everyone sees the same "Ransom Note"
+                div.innerHTML = sub.note.map(w => {
+                    // We strip the scale/hover effects for the static vote card
+                    return `<span style="display:inline-block; padding:4px 8px; margin:4px; box-shadow:2px 2px 5px rgba(0,0,0,0.2); ${getWordStyle(w)} font-size:1rem;">${w}</span>`
+                }).join(' ');
                 
                 div.onclick = () => {
                     socket.emit('submitVote', sub.id);
-                    list.innerHTML = "<h2 style='background:#f4f1e8; padding:10px; border:3px solid #000; transform:rotate(-2deg); display:inline-block;'>VOTE CAST. CALCULATING RESULTS...</h2>";
+                    list.innerHTML = "<h2 style='background:#fff; padding:10px; border:3px solid #000; transform:rotate(-2deg); display:inline-block;'>REVIEW SUBMITTED.</h2>";
                 };
                 list.appendChild(div);
             });
@@ -333,22 +360,20 @@
 
         socket.on('roundEnded', (data) => {
             showScreen('resultScreen');
-            document.getElementById('winnerName').textContent = "WINNER: " + data.winner;
+            document.getElementById('winnerName').textContent = "PROMOTED: " + data.winner;
             
-            // Show winning note
             const noteDiv = document.getElementById('winningNote');
             if(data.note && data.note.length > 0) {
-                noteDiv.innerHTML = data.note.map(w => `<span class="magnet" style="transform: rotate(${Math.random() * 10 - 5}deg);">${w}</span>`).join(' ');
+                noteDiv.innerHTML = data.note.map(w => `<span style="display:inline-block; padding:8px 15px; margin:5px; box-shadow:4px 4px 10px rgba(0,0,0,0.4); ${getWordStyle(w)} font-size:1.5rem;">${w}</span>`).join(' ');
             } else {
-                noteDiv.innerHTML = "<span style='background:#fff; padding:10px;'>No winner! (Nobody voted?)</span>";
+                noteDiv.innerHTML = "<span style='background:#fff; padding:10px;'>No promotion granted.</span>";
             }
 
-            // Scores
             const scoreList = document.getElementById('scoreList');
             scoreList.innerHTML = '';
             Object.values(data.scores).sort((a,b) => b.score - a.score).forEach(p => {
                 const li = document.createElement('li');
-                li.innerHTML = `<span style="background:#f4f1e8; padding: 5px 15px; border: 2px solid #333; transform: rotate(${Math.random()*4-2}deg); display:inline-block; margin: 5px;">${p.name}: ${p.score} PTS</span>`;
+                li.innerHTML = `<span style="background:#fff; font-family:'Permanent Marker'; padding: 5px 15px; border: 2px solid #333; transform: rotate(${Math.random()*4-2}deg); display:inline-block; margin: 5px;">${p.name}: ${p.score}</span>`;
                 scoreList.appendChild(li);
             });
         });
@@ -356,7 +381,6 @@
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            // Reset views for next round
             if(id === 'lobbyScreen') {
                  document.getElementById('wordBank').style.display = 'block';
             }

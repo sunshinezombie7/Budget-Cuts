@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BUDGET CUTS</title>
+    <title>BUDGET CUTS: DEPT OF EVERYTHING</title>
     <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Oswald:wght@700&family=Permanent+Marker&family=Special+Elite&family=Tinos:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* --- GLOBAL --- */
         body { 
-            font-family: 'Special Elite', monospace; /* Typewriter font for UI */
+            font-family: 'Special Elite', monospace; 
             background-color: #d8cba0;
             background-image: url('https://www.transparenttextures.com/patterns/crumpled-paper.png');
             text-align: center; 
@@ -18,7 +18,7 @@
         }
         
         h1 { 
-            font-family: 'Abril Fatface', cursive; /* Big Fancy Headline */
+            font-family: 'Abril Fatface', cursive; 
             font-size: 3.5rem; 
             letter-spacing: 2px;
             color: #111;
@@ -26,7 +26,6 @@
             display: inline-block; 
             padding: 10px 40px; 
             background: #fff;
-            /* Jagged cutout look */
             clip-path: polygon(3% 0%, 97% 5%, 100% 85%, 95% 100%, 5% 95%, 0% 10%);
             box-shadow: 10px 10px 0 rgba(0,0,0,0.8); 
             transform: rotate(-3deg); 
@@ -47,7 +46,7 @@
         .screen { display: none; max-width: 900px; margin: 0 auto; }
         .active { display: block; }
 
-        /* --- THE MAGNETS (Dynamic styles applied via JS) --- */
+        /* --- THE MAGNETS --- */
         .magnet {
             display: inline-block;
             padding: 5px 12px;
@@ -78,6 +77,22 @@
             align-items: center;
             gap: 15px;
             position: relative;
+        }
+        
+        /* THE THEME STAMP */
+        #corkboard::after {
+            content: 'DEPT. OF EVERYTHING';
+            position: absolute;
+            top: 15%;
+            left: 10%;
+            font-size: 3rem;
+            color: rgba(0, 0, 0, 0.1);
+            font-family: 'Special Elite', cursive;
+            transform: rotate(-10deg);
+            pointer-events: none;
+            font-weight: bold;
+            border: 5px solid rgba(0, 0, 0, 0.1);
+            padding: 10px 20px;
         }
 
         #wordBank {
@@ -145,89 +160,78 @@
     <div id="lobbyScreen" class="screen active">
         <h1>BUDGET CUTS</h1>
         <br>
-        <p style="font-size: 1.4rem; background:#fff; display:inline-block; padding:5px; transform:rotate(1deg);">
-            CORPORATE RANSOM GENERATOR
+        <p style="font-size: 1.3rem; background:#fff; display:inline-block; padding:15px; transform:rotate(1deg); border: 2px solid #000; max-width: 700px;">
+            <b>NOTICE:</b> Due to budget cuts, the Zoo, IT, and Therapy departments have been fired. 
+            <br>YOU must now answer ALL incoming tickets.
+            <br>(And we sold the keyboards, so use these magazine scraps).
         </p>
         <br><br>
-        <input type="text" id="username" placeholder="ENTER AGENT NAME">
+        <input type="text" id="username" placeholder="EMPLOYEE ID">
         <br><br>
         <button onclick="joinGame()">CLOCK IN</button>
         <br><br>
-        <h3>PENDING EMPLOYEES:</h3>
+        <h3>AVAILABLE STAFF:</h3>
         <ul id="lobbyList" style="list-style: none; padding: 0;"></ul>
-        <button id="startBtn" onclick="startGame()" style="display:none; background:#2e7d32; box-shadow: 6px 6px 0 #1b5e20;">INITIATE LAYOFFS</button>
+        <button id="startBtn" onclick="startGame()" style="display:none; background:#2e7d32; box-shadow: 6px 6px 0 #1b5e20;">OPEN TICKET QUEUE</button>
     </div>
 
     <div id="gameScreen" class="screen">
         <div class="timer" id="timer">90</div>
-        <div class="prompt-box" id="promptText">LOADING MEMO...</div>
+        <div class="prompt-box" id="promptText">LOADING TICKET #4092...</div>
         
-        <h3>COMPOSE YOUR THREAT:</h3>
+        <h3>YOUR RESPONSE:</h3>
         <div id="corkboard">
             <span style="color:rgba(255,255,255,0.7); font-style:italic; font-size: 1.2rem; background:rgba(0,0,0,0.5); padding: 5px;" id="emptyMsg">
-                Drag words here to construct your sentence...
+                Drag scraps here to answer the ticket...
             </span>
         </div>
         
-        <button onclick="submitNote()" style="margin-bottom:25px; background:#d32f2f; box-shadow: 6px 6px 0 #8b0000;">SUBMIT TO HR</button>
+        <button onclick="submitNote()" style="margin-bottom:25px; background:#d32f2f; box-shadow: 6px 6px 0 #8b0000;">RESOLVE TICKET</button>
 
-        <h3>AVAILABLE CLIPPINGS:</h3>
+        <h3>OFFICE SCRAPS:</h3>
         <div id="wordBank"></div>
     </div>
 
     <div id="votingScreen" class="screen">
-        <h1>PERFORMANCE REVIEW</h1>
+        <h1>QUALITY ASSURANCE</h1>
+        <p style="background:#fff; display:inline-block; padding:5px;">SELECT THE MOST "PROFESSIONAL" RESPONSE:</p>
         <div class="prompt-box" id="votePrompt"></div>
         <div id="submissionsList"></div>
     </div>
 
     <div id="resultScreen" class="screen">
-        <h1>EMPLOYEE OF THE MONTH</h1>
+        <h1>TICKET CLOSED</h1>
         <div class="prompt-box" id="winnerName" style="background:#fbc02d; color:#000;"></div>
         
         <div id="winningNote" style="padding: 40px; background: url('https://www.transparenttextures.com/patterns/cork-board.png'), #a0522d; border: 15px solid #d4c4a8; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); margin: 30px auto; max-width: 700px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; min-height: 150px; align-items: center;"></div>
         
-        <h3>FINAL SCORES</h3>
+        <h3>EMPLOYEE PERFORMANCE</h3>
         <ul id="scoreList" style="list-style: none; padding:0; font-size: 1.3rem;"></ul>
-        <button onclick="location.reload()">NEXT FISCAL YEAR</button>
+        <button onclick="location.reload()">NEXT TICKET</button>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        // --- STYLE GENERATOR ---
-        // This function creates a specific "look" for every unique word.
-        // "Manager" will always look the same, "Refund" will always look the same.
+        // --- STYLE GENERATOR (Same as before) ---
         function getWordStyle(word) {
             let hash = 0;
             for (let i = 0; i < word.length; i++) {
                 hash = word.charCodeAt(i) + ((hash << 5) - hash);
             }
             
-            // The Palette of Styles (Newspaper, Magazine, Ransom, Coupon)
             const styles = [
-                // 1. Classic News (Serif, White)
                 { bg: '#fdfbf7', color: '#111', font: "'Tinos', serif", weight: '400', trans: 'none', border: 'none' },
-                // 2. Magazine Headline (Bold, White, Caps)
                 { bg: '#ffffff', color: '#000', font: "'Oswald', sans-serif", weight: '700', trans: 'uppercase', border: 'none' },
-                // 3. Inverted Warning (Black, White Text)
                 { bg: '#111111', color: '#fdfbf7', font: "'Oswald', sans-serif", weight: '400', trans: 'uppercase', border: 'none' },
-                // 4. Tabloid Pink (Pink, Bold)
                 { bg: '#ff80ab', color: '#000', font: "'Oswald', sans-serif", weight: '700', trans: 'uppercase', border: 'none' },
-                // 5. Highlighter Yellow
                 { bg: '#ffeb3b', color: '#000', font: "'Special Elite', cursive", weight: '700', trans: 'none', border: '1px dashed #000' },
-                // 6. Blue Coupon
                 { bg: '#80d8ff', color: '#000', font: "'Tinos', serif", weight: '700', trans: 'none', border: '2px dotted #000' },
-                // 7. Red Alert
                 { bg: '#d32f2f', color: '#fff', font: "'Impact', sans-serif", weight: '400', trans: 'uppercase', border: 'none' }
             ];
 
             const index = Math.abs(hash) % styles.length;
             const s = styles[index];
-            
-            // Random rotation (seeded by word hash + index so it's consistent)
-            const rot = (Math.abs(hash * 2) % 10) - 5; // -5 to +5 degrees
-            
-            // Random clip-path (jagged edges)
+            const rot = (Math.abs(hash * 2) % 10) - 5; 
             const clip = `polygon(${2+Math.abs(hash)%3}% ${0+Math.abs(hash)%4}%, ${96+Math.abs(hash)%3}% ${2+Math.abs(hash)%2}%, ${98+Math.abs(hash)%2}% ${95+Math.abs(hash)%3}%, ${2+Math.abs(hash)%2}% ${98+Math.abs(hash)%2}%)`;
 
             return `
@@ -297,7 +301,7 @@
                 const span = document.createElement('span');
                 span.className = 'magnet';
                 span.textContent = word;
-                span.style.cssText = getWordStyle(word); // APPLY THE STYLE!
+                span.style.cssText = getWordStyle(word);
                 
                 span.onclick = () => {
                     myHand.splice(index, 1);
@@ -309,13 +313,13 @@
 
             // Draw Note (Board)
             if(myNote.length === 0) {
-                board.innerHTML = '<span style="color:rgba(255,255,255,0.7); font-style:italic; font-size: 1.2rem; background:rgba(0,0,0,0.5); padding: 5px;">Drag words here...</span>';
+                board.innerHTML = '<span style="color:rgba(255,255,255,0.7); font-style:italic; font-size: 1.2rem; background:rgba(0,0,0,0.5); padding: 5px;">Drag scraps here to answer...</span>';
             } else {
                 myNote.forEach((word, index) => {
                     const span = document.createElement('span');
                     span.className = 'magnet';
                     span.textContent = word;
-                    span.style.cssText = getWordStyle(word); // SAME STYLE!
+                    span.style.cssText = getWordStyle(word); 
                     
                     span.onclick = () => {
                         myNote.splice(index, 1);
@@ -330,7 +334,7 @@
         function submitNote() {
             if(myNote.length > 0) {
                 socket.emit('submitNote', myNote);
-                document.getElementById('corkboard').innerHTML = "<h2 style='background:#fff; padding:10px; border:3px solid #000; transform:rotate(-2deg); display:inline-block;'>SENT TO HR. PLEASE WAIT...</h2>";
+                document.getElementById('corkboard').innerHTML = "<h2 style='background:#fff; padding:10px; border:3px solid #000; transform:rotate(-2deg); display:inline-block;'>RESPONSE SENT.</h2>";
                 document.getElementById('wordBank').style.display = 'none';
             }
         }
@@ -344,15 +348,14 @@
             submissions.forEach(sub => {
                 const div = document.createElement('div');
                 div.className = 'vote-card';
-                // Render the note using the same styles so everyone sees the same "Ransom Note"
                 div.innerHTML = sub.note.map(w => {
-                    // We strip the scale/hover effects for the static vote card
+                    // Strip scale/hover for static card
                     return `<span style="display:inline-block; padding:4px 8px; margin:4px; box-shadow:2px 2px 5px rgba(0,0,0,0.2); ${getWordStyle(w)} font-size:1rem;">${w}</span>`
                 }).join(' ');
                 
                 div.onclick = () => {
                     socket.emit('submitVote', sub.id);
-                    list.innerHTML = "<h2 style='background:#fff; padding:10px; border:3px solid #000; transform:rotate(-2deg); display:inline-block;'>REVIEW SUBMITTED.</h2>";
+                    list.innerHTML = "<h2 style='background:#fff; padding:10px; border:3px solid #000; transform:rotate(-2deg); display:inline-block;'>REVIEW FILED.</h2>";
                 };
                 list.appendChild(div);
             });
@@ -360,13 +363,13 @@
 
         socket.on('roundEnded', (data) => {
             showScreen('resultScreen');
-            document.getElementById('winnerName').textContent = "PROMOTED: " + data.winner;
+            document.getElementById('winnerName').textContent = "BEST EMPLOYEE: " + data.winner;
             
             const noteDiv = document.getElementById('winningNote');
             if(data.note && data.note.length > 0) {
                 noteDiv.innerHTML = data.note.map(w => `<span style="display:inline-block; padding:8px 15px; margin:5px; box-shadow:4px 4px 10px rgba(0,0,0,0.4); ${getWordStyle(w)} font-size:1.5rem;">${w}</span>`).join(' ');
             } else {
-                noteDiv.innerHTML = "<span style='background:#fff; padding:10px;'>No promotion granted.</span>";
+                noteDiv.innerHTML = "<span style='background:#fff; padding:10px;'>Negotiations failed. (No votes)</span>";
             }
 
             const scoreList = document.getElementById('scoreList');

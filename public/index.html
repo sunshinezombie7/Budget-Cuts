@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magnet Mayhem</title>
+    <style>
+        body { font-family: 'Courier New', Courier, monospace; background: #d2b48c; text-align: center; margin: 0; padding: 20px; }
+        
+        h1 { font-size: 2.5rem; text-transform: uppercase; border: 3px solid #000; display: inline-block; padding: 10px; background: #fff; box-shadow: 5px 5px 0 #000; transform: rotate(-2deg); }
+        
+        /* SCREENS */
+        .screen { display: none; max-width: 800px; margin: 0 auto; }
+        .active { display: block; }
+
+        /* MAGNETS */
+        .magnet {
+            display: inline-block;
+            background: #fff;
+            padding: 5px 10px;
+            margin: 5px;
+            border: 1px solid #000;
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            user-select: none;
+            transition: transform 0.1s;
+        }
+        .magnet:hover { transform: scale(1.1); background: #ffffcc; }
+        .magnet:active { transform: scale(0.95); }
+
+        /* WORKSPACE */
+        #corkboard {
+            background: url('https://www.transparenttextures.com/patterns/cork-board.png'), #a0522d;
+            border: 10px solid #5c4033;
+            padding: 20px;
+            min-height: 150px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #wordBank {
+            background: #eee;
+            padding: 15px;
+            border: 2px dashed #999;
+            min-height: 200px;
+        }
+
+        /* VOTING CARDS */
+        .vote-card {
+            background: #fff;
+            border: 2px solid #000;
+            margin: 15px 0;
+            padding: 15px;
+            cursor: pointer;
+            box-shadow: 3px 3px 0 #000;
+        }
+        .vote-card:hover { background: #ccffcc; transform: translateX(5px); }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            background: #ff3333;
+            color: #fff;
+            border: 3px solid #000;
+            cursor: pointer;
+            box-shadow: 4px 4px 0 #000;
+        }
+        button:hover { top: -2px; position: relative; }
+        
+        input { padding: 10px; font-size: 1.2rem; border: 2px solid #000; }
+        
+        .timer { font-size: 3rem; color: #cc0000; font-weight: bold; margin: 10px 0; }
+        .prompt-box { background: #000; color: #fff; padding: 15px; font-size: 1.5rem; margin-bottom: 20px; transform: rotate(1deg); }
+    </style>
+</head>
+<body>
+
+    <div id="lobbyScreen" class="screen active">
+        <h1>MAGNET MAYHEM</h1>
+        <br><br>
+        <input type="text" id="username" placeholder="ENTER CODENAME">
+        <button onclick="joinGame()">JOIN MISSION</button>
+        <br><br>
+        <h3>AGENTS IN LOBBY:</h3>
+        <ul id="lobbyList" style="list-style: none; padding: 0;"></ul>
+        <button id="startBtn" onclick="startGame()" style="display:none; background:#00cc00;">START OPERATION</button>
+    </div>
+
+    <div id="gameScreen" class="screen">
+        <div class="prompt-box" id="promptText">WAITING FOR TARGET...</div>
+        <div class="timer" id="timer">90</div>
+        
+        <h3>YOUR RANSOM NOTE:</h3>
+        <div id="corkboard">
+            <span style="color:rgba(255,255,255,0.5); font-style:italic;" id="emptyMsg">Click words below to add them here...</span>
+        </div>
+        
+        <button onclick="submitNote()" style="margin-bottom:10px;">SUBMIT THREAT</button>
+
+        <h3>WORD BANK:</h3>
+        <div id="wordBank"></div>
+    </div>
+
+    <div id="votingScreen" class="screen">
+        <h1>VOTE FOR THE BEST</h1>
+        <div class="prompt-box" id="votePrompt"></div>
+        <div id="submissionsList"></div>
+    </div>
+
+    <div id="resultScreen" class="screen">
+        <h1>WINNER!</h1>
+        <div class="prompt-box" id="winnerName" style="background:#ffd700; color:#000;"></div>
+        <div id="winningNote" style="font-size: 2rem; padding: 20px; background: #fff; border: 3px solid #000; margin: 20px 0;"></div>
+        
+        <h3>SCORES</h3>
+        <ul id="scoreList"></ul>
+        <button onclick="location.reload()">NEXT ROUND</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let myHand = [];
+        let myNote = [];
+
+        function joinGame() {
+            const name = document.getElementById('username').value;
+            if(name) {
+                socket.emit('joinGame', name);
+                document.getElementById('startBtn').style.display = 'inline-block'; // Simple host logic
+            }
+        }
+
+        function startGame() {
+            socket.emit('startGame');
+        }
+
+        socket.on('updateLobby', (data) => {
+            const list = document.getElementById('lobbyList');
+            list.innerHTML = '';
+            Object.values(data.players).forEach(p => {
+                const li = document.createElement('li');
+                li.textContent = p.name + (p.submission ? ' (READY)' : '');
+                li.style.fontSize = '1.2rem';
+                li.style.padding = '5px';
+                list.appendChild(li);
+            });
+        });
+
+        socket.on('gameStarted', (data) => {
+            showScreen('gameScreen');
+            document.getElementById('promptText').textContent = data.prompt;
+            document.getElementById('timer').textContent = data.time;
+        });
+
+        socket.on('timerUpdate', (t) => {
+            document.getElementById('timer').textContent = t;
+        });
+
+        socket.on('dealHand', (data) => {
+            myHand = data.hand;
+            myNote = [];
+            renderBoard();
+        });
+
+        function renderBoard() {
+            const bank = document.getElementById('wordBank');
+            const board = document.getElementById('corkboard');
+            bank.innerHTML = '';
+            board.innerHTML = '';
+
+            // Draw Hand (Bank)
+            myHand.forEach((word, index) => {
+                const span = document.createElement('span');
+                span.className = 'magnet';
+                span.textContent = word;
+                // Random rotation for "messy" look
+                span.style.transform = `rotate(${Math.random() * 10 - 5}deg)`;
+                span.onclick = () => {
+                    myHand.splice(index, 1);
+                    myNote.push(word);
+                    renderBoard();
+                };
+                bank.appendChild(span);
+            });
+
+            // Draw Note (Board)
+            if(myNote.length === 0) {
+                board.innerHTML = '<span style="color:rgba(255,255,255,0.5); font-style:italic;">Click words below to add them here...</span>';
+            } else {
+                myNote.forEach((word, index) => {
+                    const span = document.createElement('span');
+                    span.className = 'magnet';
+                    span.textContent = word;
+                    span.onclick = () => {
+                        myNote.splice(index, 1);
+                        myHand.push(word);
+                        renderBoard();
+                    };
+                    board.appendChild(span);
+                });
+            }
+        }
+
+        function submitNote() {
+            if(myNote.length > 0) {
+                socket.emit('submitNote', myNote);
+                document.getElementById('corkboard').innerHTML = "<h3>SUBMITTED! WAITING FOR OTHERS...</h3>";
+                document.getElementById('wordBank').style.display = 'none';
+            }
+        }
+
+        socket.on('startVoting', (submissions) => {
+            showScreen('votingScreen');
+            document.getElementById('votePrompt').textContent = document.getElementById('promptText').textContent;
+            const list = document.getElementById('submissionsList');
+            list.innerHTML = '';
+
+            submissions.forEach(sub => {
+                const div = document.createElement('div');
+                div.className = 'vote-card';
+                // Convert array of words back to sentence
+                div.innerHTML = sub.note.map(w => `<span class="magnet" style="border:none; box-shadow:none; background:transparent;">${w}</span>`).join(' ');
+                
+                div.onclick = () => {
+                    socket.emit('submitVote', sub.id);
+                    list.innerHTML = "<h3>VOTE CAST! WAITING FOR RESULTS...</h3>";
+                };
+                list.appendChild(div);
+            });
+        });
+
+        socket.on('roundEnded', (data) => {
+            showScreen('resultScreen');
+            document.getElementById('winnerName').textContent = "WINNER: " + data.winner;
+            
+            // Show winning note
+            const noteDiv = document.getElementById('winningNote');
+            if(data.note) {
+                noteDiv.innerHTML = data.note.map(w => `<span class="magnet">${w}</span>`).join(' ');
+            } else {
+                noteDiv.textContent = "No winner!";
+            }
+
+            // Scores
+            const scoreList = document.getElementById('scoreList');
+            scoreList.innerHTML = '';
+            Object.values(data.scores).sort((a,b) => b.score - a.score).forEach(p => {
+                const li = document.createElement('li');
+                li.textContent = `${p.name}: ${p.score} PTS`;
+                scoreList.appendChild(li);
+            });
+        });
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+    </script>
+</body>
+</html>

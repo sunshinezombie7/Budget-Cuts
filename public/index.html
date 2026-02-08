@@ -254,6 +254,11 @@
         let myHand = [];
         let myNote = [];
 
+        // ENTER KEY LISTENER
+        document.getElementById('username').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') joinGame();
+        });
+
         function joinGame() {
             const name = document.getElementById('username').value;
             if(name) {

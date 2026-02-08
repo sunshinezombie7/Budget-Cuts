@@ -361,17 +361,31 @@
             });
         });
 
-        socket.on('roundEnded', (data) => {
+       socket.on('roundEnded', (data) => {
             showScreen('resultScreen');
-            document.getElementById('winnerName').textContent = "BEST EMPLOYEE: " + data.winner;
-            
+            const winnerNameBox = document.getElementById('winnerName');
             const noteDiv = document.getElementById('winningNote');
-            if(data.note && data.note.length > 0) {
-                noteDiv.innerHTML = data.note.map(w => `<span style="display:inline-block; padding:8px 15px; margin:5px; box-shadow:4px 4px 10px rgba(0,0,0,0.4); ${getWordStyle(w)} font-size:1.5rem;">${w}</span>`).join(' ');
+            
+            if (data.isTie) {
+                // --- TIE GAME DISPLAY ---
+                winnerNameBox.textContent = "ADMINISTRATIVE DEADLOCK: " + data.winnerName;
+                winnerNameBox.style.background = "#999"; // Grey for deadlock
+                
+                noteDiv.innerHTML = "<h2 style='background:#fff; padding:15px; border:2px solid #000; transform:rotate(2deg);'>BUDGET FROZEN.<br>(VOTES WERE TIED)</h2>";
             } else {
-                noteDiv.innerHTML = "<span style='background:#fff; padding:10px;'>Negotiations failed. (No votes)</span>";
+                // --- SINGLE WINNER DISPLAY ---
+                winnerNameBox.textContent = "BEST EMPLOYEE: " + data.winnerName;
+                winnerNameBox.style.background = "#fbc02d"; // Gold for winner
+                
+                // Show the winning note
+                if(data.winnerNote && data.winnerNote.length > 0) {
+                    noteDiv.innerHTML = data.winnerNote.map(w => `<span style="display:inline-block; padding:8px 15px; margin:5px; box-shadow:4px 4px 10px rgba(0,0,0,0.4); ${getWordStyle(w)} font-size:1.5rem;">${w}</span>`).join(' ');
+                } else {
+                    noteDiv.innerHTML = "<span style='background:#fff; padding:10px;'>File Corrupted.</span>";
+                }
             }
 
+            // Update Score List
             const scoreList = document.getElementById('scoreList');
             scoreList.innerHTML = '';
             Object.values(data.scores).sort((a,b) => b.score - a.score).forEach(p => {

@@ -9,7 +9,7 @@ const io = new Server(server);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- GAME DATA: DEPT OF EVERYTHING ---
+// --- GAME DATA ---
 const PROMPTS = [
     "The real reason I was late to the meeting.",
     "Why the server actually crashed.",
@@ -45,7 +45,6 @@ const PROMPTS = [
     "Meeting Minutes: What the office dog was actually thinking."
 ];
 
-// --- WORD BANK ---
 const WORD_BANK = [
     "the", "a", "is", "of", "in", "on", "at", "and", "but", "with", "for", "very", "too", "my", "your",
     "his", "her", "he", "she", "it", "we", "they", "me", "you", "him", "us", "them", "i", "who", "what",
@@ -121,11 +120,24 @@ let currentPrompt = "";
 let votes = {};
 let roundTimer = null;
 let voters = new Set();
+let hostId = null; // Track who is the Host
 
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
 
     socket.on('joinGame', (name) => {
+        // 1. UNIQUE NAME CHECK
+        const nameExists = Object.values(players).some(p => p.name.toLowerCase() === name.toLowerCase());
+        if(nameExists) {
+            socket.emit('joinError', 'Identity Theft Detected! Name already taken.');
+            return;
+        }
+
+        // 2. ASSIGN HOST (First player becomes host)
+        if (Object.keys(players).length === 0) {
+            hostId = socket.id;
+        }
+
         players[socket.id] = {
             id: socket.id,
             name: name || `Employee ${socket.id.substr(0,4)}`,
@@ -133,10 +145,13 @@ io.on('connection', (socket) => {
             hand: [],
             submission: null
         };
-        io.emit('updateLobby', { players, state: gameState });
+        
+        // Broadcast lobby update (including who is host)
+        io.emit('updateLobby', { players, state: gameState, hostId });
     });
 
-    socket.on('startGame', () => {
+    // Helper function to start a round (used for Game Start AND Next Round)
+    const startRoundLogic = () => {
         gameState = 'crafting';
         currentPrompt = PROMPTS[Math.floor(Math.random() * PROMPTS.length)];
         votes = {};
@@ -163,6 +178,21 @@ io.on('connection', (socket) => {
                 startVotingPhase();
             }
         }, 1000);
+    };
+
+    socket.on('startGame', () => {
+        // Only Host can start
+        if(socket.id === hostId) {
+            startRoundLogic();
+        }
+    });
+
+    // 3. START NEXT ROUND (Looping back)
+    socket.on('startNextRound', () => {
+        // Only Host can advance round
+        if(socket.id === hostId) {
+            startRoundLogic();
+        }
     });
 
     socket.on('submitNote', (noteArray) => {
@@ -196,7 +226,18 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         delete players[socket.id];
         voters.delete(socket.id);
-        io.emit('updateLobby', { players, state: gameState });
+        
+        // Re-assign host if host left
+        if(socket.id === hostId) {
+            const remainingIds = Object.keys(players);
+            if(remainingIds.length > 0) {
+                hostId = remainingIds[0]; // Next player becomes host
+            } else {
+                hostId = null;
+            }
+        }
+        
+        io.emit('updateLobby', { players, state: gameState, hostId });
     });
 });
 
@@ -215,12 +256,10 @@ function endRound() {
     let maxVotes = -1;
     let winners = [];
     
-    // Find Max Votes
     Object.keys(votes).forEach(id => {
         if(votes[id] > maxVotes) maxVotes = votes[id];
     });
 
-    // Find ALL players who have that score
     Object.keys(votes).forEach(id => {
         if(votes[id] === maxVotes) winners.push(id);
     });
@@ -229,19 +268,17 @@ function endRound() {
         scores: players,
         isTie: false,
         winnerName: "",
-        winnerNote: []
+        winnerNote: [],
+        hostId: hostId // Send host ID so client knows who can click Next
     };
 
     if (winners.length > 1) {
-        // --- IT IS A TIE ---
         resultData.isTie = true;
         resultData.winnerName = winners.map(id => players[id] ? players[id].name : "Unknown").join(" & ");
-        // Give points to all tied players
         winners.forEach(id => {
             if(players[id]) players[id].score++;
         });
     } else if (winners.length === 1) {
-        // --- SINGLE WINNER ---
         const wId = winners[0];
         if(players[wId]) {
             players[wId].score++;
@@ -249,7 +286,6 @@ function endRound() {
             resultData.winnerNote = players[wId].submission;
         }
     } else {
-        // --- NO VOTES CAST ---
         resultData.isTie = true;
         resultData.winnerName = "Nobody (No Votes)";
     }

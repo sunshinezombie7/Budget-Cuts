@@ -14,7 +14,7 @@ const PROMPTS = [
     "The real reason I was late to the meeting.",
     "Why the server actually crashed.",
     "The cafeteria's new rejected ice cream flavor.",
-    "The worst thing to say in the elevator with the CEO.",
+    "The worst thing to say in an elevator with the CEO.",
     "What I actually found in the back of the office fridge.",
     "The real reason I put you on hold.",
     "Translation of: 'Let me check that for you'.",
@@ -45,12 +45,17 @@ const PROMPTS = [
     "Meeting Minutes: What the office dog was actually thinking."
 ];
 
-const WORD_BANK = [
+// --- 1. COMMON WORDS (High Frequency - Everyone gets a bunch of these) ---
+const COMMON_WORDS = [
     "the", "a", "is", "of", "in", "on", "at", "and", "but", "with", "for", "very", "too", "my", "your",
     "his", "her", "he", "she", "it", "we", "they", "me", "you", "him", "us", "them", "i", "who", "what",
     "where", "when", "why", "how", "because", "if", "or", "so", "as", "by", "from", "to", "up", "down",
     "out", "over", "under", "about", "after", "before", "while", "until", "never", "always", "not", "no", 
-    "yes", "maybe", "please", "sorry", "thank you", "hello", "goodbye", "this", "that", "these", "those",
+    "yes", "maybe", "please", "sorry", "thank you", "hello", "goodbye", "this", "that", "these", "those"
+];
+
+// --- 2. FLAVOR WORDS (Low Frequency - Randomly distributed) ---
+const FLAVOR_WORDS = [
     "refund", "manager", "escalate", "mute", "hold", "scream", "headset", "toilet", "ticket", "system", 
     "loop", "survey", "zero", "transfer", "hang-up", "KPIs", "quality", "assurance", "script", "robot", 
     "human", "dumb", "angry", "lying", "slow", "broken", "virus", "demon", "spider", "fingers", "mouth", 
@@ -120,20 +125,18 @@ let currentPrompt = "";
 let votes = {};
 let roundTimer = null;
 let voters = new Set();
-let hostId = null; // Track who is the Host
+let hostId = null; 
 
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
 
     socket.on('joinGame', (name) => {
-        // 1. UNIQUE NAME CHECK
         const nameExists = Object.values(players).some(p => p.name.toLowerCase() === name.toLowerCase());
         if(nameExists) {
             socket.emit('joinError', 'Identity Theft Detected! Name already taken.');
             return;
         }
 
-        // 2. ASSIGN HOST (First player becomes host)
         if (Object.keys(players).length === 0) {
             hostId = socket.id;
         }
@@ -146,23 +149,34 @@ io.on('connection', (socket) => {
             submission: null
         };
         
-        // Broadcast lobby update (including who is host)
         io.emit('updateLobby', { players, state: gameState, hostId });
     });
 
-    // Helper function to start a round (used for Game Start AND Next Round)
+    // --- REUSABLE START LOGIC ---
     const startRoundLogic = () => {
         gameState = 'crafting';
         currentPrompt = PROMPTS[Math.floor(Math.random() * PROMPTS.length)];
         votes = {};
         voters.clear();
 
+        // --- NEW DEALING LOGIC: WEIGHTED DISTRIBUTIONS ---
         Object.keys(players).forEach(id => {
             players[id].submission = null;
             players[id].hand = [];
-            for(let i=0; i<60; i++) {
-                players[id].hand.push(WORD_BANK[Math.floor(Math.random() * WORD_BANK.length)]);
+            
+            // 1. Give 25 "Common" words (High probability connectors)
+            for(let i=0; i<25; i++) {
+                players[id].hand.push(COMMON_WORDS[Math.floor(Math.random() * COMMON_WORDS.length)]);
             }
+
+            // 2. Give 35 "Flavor" words (Low probability unique words)
+            for(let i=0; i<35; i++) {
+                players[id].hand.push(FLAVOR_WORDS[Math.floor(Math.random() * FLAVOR_WORDS.length)]);
+            }
+
+            // 3. Shuffle the hand so they are mixed up
+            players[id].hand.sort(() => Math.random() - 0.5);
+
             io.to(id).emit('dealHand', { hand: players[id].hand, prompt: currentPrompt });
         });
 
@@ -181,15 +195,12 @@ io.on('connection', (socket) => {
     };
 
     socket.on('startGame', () => {
-        // Only Host can start
         if(socket.id === hostId) {
             startRoundLogic();
         }
     });
 
-    // 3. START NEXT ROUND (Looping back)
     socket.on('startNextRound', () => {
-        // Only Host can advance round
         if(socket.id === hostId) {
             startRoundLogic();
         }
@@ -227,11 +238,10 @@ io.on('connection', (socket) => {
         delete players[socket.id];
         voters.delete(socket.id);
         
-        // Re-assign host if host left
         if(socket.id === hostId) {
             const remainingIds = Object.keys(players);
             if(remainingIds.length > 0) {
-                hostId = remainingIds[0]; // Next player becomes host
+                hostId = remainingIds[0]; 
             } else {
                 hostId = null;
             }
@@ -269,7 +279,7 @@ function endRound() {
         isTie: false,
         winnerName: "",
         winnerNote: [],
-        hostId: hostId // Send host ID so client knows who can click Next
+        hostId: hostId 
     };
 
     if (winners.length > 1) {

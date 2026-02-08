@@ -79,7 +79,6 @@
             position: relative;
         }
         
-        /* THE THEME STAMP */
         #corkboard::after {
             content: 'DEPT. OF EVERYTHING';
             position: absolute;
@@ -153,6 +152,9 @@
             clip-path: polygon(0% 0%, 100% 2%, 98% 100%, 2% 98%);
             transform: rotate(-1deg);
         }
+        
+        /* Host Only Button Class */
+        .host-only { display: none; }
     </style>
 </head>
 <body>
@@ -161,7 +163,7 @@
         <h1>BUDGET CUTS</h1>
         <br>
         <p style="font-size: 1.3rem; background:#fff; display:inline-block; padding:15px; transform:rotate(1deg); border: 2px solid #000; max-width: 700px;">
-            <b>NOTICE:</b> Due to budget cuts all other departments have been fired. 
+            <b>NOTICE:</b> Due to budget cuts, the Zoo, IT, and Therapy departments have been fired. 
             <br>YOU must now answer ALL incoming tickets.
             <br>(And we sold the keyboards, so use these magazine scraps).
         </p>
@@ -172,12 +174,12 @@
         <br><br>
         <h3>AVAILABLE STAFF:</h3>
         <ul id="lobbyList" style="list-style: none; padding: 0;"></ul>
-        <button id="startBtn" onclick="startGame()" style="display:none; background:#2e7d32; box-shadow: 6px 6px 0 #1b5e20;">OPEN TICKET QUEUE</button>
+        <button id="startBtn" class="host-only" onclick="startGame()" style="background:#2e7d32; box-shadow: 6px 6px 0 #1b5e20;">OPEN TICKET QUEUE</button>
     </div>
 
     <div id="gameScreen" class="screen">
         <div class="timer" id="timer">90</div>
-        <div class="prompt-box" id="promptText">LOADING TICKET #4092...</div>
+        <div class="prompt-box" id="promptText">LOADING TICKET...</div>
         
         <h3>YOUR RESPONSE:</h3>
         <div id="corkboard">
@@ -200,19 +202,20 @@
     </div>
 
     <div id="resultScreen" class="screen">
-        <h1>TICKET CLOSED</h1>
+        <h1>TICKET STATUS</h1>
         <div class="prompt-box" id="winnerName" style="background:#fbc02d; color:#000;"></div>
         
         <div id="winningNote" style="padding: 40px; background: url('https://www.transparenttextures.com/patterns/cork-board.png'), #a0522d; border: 15px solid #d4c4a8; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); margin: 30px auto; max-width: 700px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; min-height: 150px; align-items: center;"></div>
         
         <h3>EMPLOYEE PERFORMANCE</h3>
         <ul id="scoreList" style="list-style: none; padding:0; font-size: 1.3rem;"></ul>
-        <button onclick="location.reload()">NEXT TICKET</button>
+        <button id="nextRoundBtn" class="host-only" onclick="startNextRound()">OPEN NEXT TICKET</button>
+        <p id="waitingMsg" style="display:none; font-weight:bold;">WAITING FOR HOST TO OPEN NEXT TICKET...</p>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        // --- STYLE GENERATOR (Same as before) ---
+        // --- STYLE GENERATOR ---
         function getWordStyle(word) {
             let hash = 0;
             for (let i = 0; i < word.length; i++) {
@@ -255,20 +258,37 @@
             const name = document.getElementById('username').value;
             if(name) {
                 socket.emit('joinGame', name);
-                document.getElementById('startBtn').style.display = 'inline-block'; 
             }
         }
+
+        socket.on('joinError', (msg) => {
+            alert(msg);
+        });
 
         function startGame() {
             socket.emit('startGame');
         }
 
+        function startNextRound() {
+            socket.emit('startNextRound');
+        }
+
         socket.on('updateLobby', (data) => {
             const list = document.getElementById('lobbyList');
             list.innerHTML = '';
+            
+            // Check if I am host
+            const isHost = (socket.id === data.hostId);
+            const startBtn = document.getElementById('startBtn');
+            if(isHost) {
+                startBtn.style.display = 'inline-block';
+            } else {
+                startBtn.style.display = 'none';
+            }
+
             Object.values(data.players).forEach(p => {
                 const li = document.createElement('li');
-                li.innerHTML = `<span style="background:#fff; font-family:'Permanent Marker'; padding: 5px 15px; border: 2px solid #333; transform: rotate(${Math.random()*4-2}deg); display:inline-block; font-size:1.4rem;">${p.name} ${p.submission ? '✅' : ''}</span>`;
+                li.innerHTML = `<span style="background:#fff; font-family:'Permanent Marker'; padding: 5px 15px; border: 2px solid #333; transform: rotate(${Math.random()*4-2}deg); display:inline-block; font-size:1.4rem;">${p.name} ${p.submission ? '✅' : ''} ${p.id === data.hostId ? '👑' : ''}</span>`;
                 li.style.margin = '10px 0';
                 list.appendChild(li);
             });
@@ -313,7 +333,7 @@
 
             // Draw Note (Board)
             if(myNote.length === 0) {
-                board.innerHTML = '<span style="color:rgba(255,255,255,0.7); font-style:italic; font-size: 1.2rem; background:rgba(0,0,0,0.5); padding: 5px;">Drag scraps here to answer...</span>';
+                board.innerHTML = '<span style="color:rgba(255,255,255,0.7); font-style:italic; font-size: 1.2rem; background:rgba(0,0,0,0.5); padding: 5px;">Drag scraps here...</span>';
             } else {
                 myNote.forEach((word, index) => {
                     const span = document.createElement('span');
@@ -349,7 +369,6 @@
                 const div = document.createElement('div');
                 div.className = 'vote-card';
                 div.innerHTML = sub.note.map(w => {
-                    // Strip scale/hover for static card
                     return `<span style="display:inline-block; padding:4px 8px; margin:4px; box-shadow:2px 2px 5px rgba(0,0,0,0.2); ${getWordStyle(w)} font-size:1rem;">${w}</span>`
                 }).join(' ');
                 
@@ -361,23 +380,32 @@
             });
         });
 
-       socket.on('roundEnded', (data) => {
+        socket.on('roundEnded', (data) => {
             showScreen('resultScreen');
             const winnerNameBox = document.getElementById('winnerName');
             const noteDiv = document.getElementById('winningNote');
             
+            // Handle Host/Next Round Button visibility
+            const isHost = (socket.id === data.hostId);
+            const nextBtn = document.getElementById('nextRoundBtn');
+            const waitMsg = document.getElementById('waitingMsg');
+            
+            if (isHost) {
+                nextBtn.style.display = 'inline-block';
+                waitMsg.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'none';
+                waitMsg.style.display = 'block';
+            }
+
             if (data.isTie) {
-                // --- TIE GAME DISPLAY ---
                 winnerNameBox.textContent = "ADMINISTRATIVE DEADLOCK: " + data.winnerName;
-                winnerNameBox.style.background = "#999"; // Grey for deadlock
-                
+                winnerNameBox.style.background = "#999"; 
                 noteDiv.innerHTML = "<h2 style='background:#fff; padding:15px; border:2px solid #000; transform:rotate(2deg);'>BUDGET FROZEN.<br>(VOTES WERE TIED)</h2>";
             } else {
-                // --- SINGLE WINNER DISPLAY ---
                 winnerNameBox.textContent = "BEST EMPLOYEE: " + data.winnerName;
-                winnerNameBox.style.background = "#fbc02d"; // Gold for winner
+                winnerNameBox.style.background = "#fbc02d"; 
                 
-                // Show the winning note
                 if(data.winnerNote && data.winnerNote.length > 0) {
                     noteDiv.innerHTML = data.winnerNote.map(w => `<span style="display:inline-block; padding:8px 15px; margin:5px; box-shadow:4px 4px 10px rgba(0,0,0,0.4); ${getWordStyle(w)} font-size:1.5rem;">${w}</span>`).join(' ');
                 } else {
@@ -385,7 +413,6 @@
                 }
             }
 
-            // Update Score List
             const scoreList = document.getElementById('scoreList');
             scoreList.innerHTML = '';
             Object.values(data.scores).sort((a,b) => b.score - a.score).forEach(p => {
@@ -400,6 +427,9 @@
             document.getElementById(id).classList.add('active');
             if(id === 'lobbyScreen') {
                  document.getElementById('wordBank').style.display = 'block';
+            }
+            if(id === 'gameScreen') {
+                document.getElementById('wordBank').style.display = 'block';
             }
         }
     </script>

@@ -11,7 +11,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // --- GAME DATA: DEPT OF EVERYTHING ---
 const PROMPTS = [
-    // Normal Office Tickets
     "The real reason I was late to the meeting.",
     "Why the server actually crashed.",
     "The cafeteria's new rejected ice cream flavor.",
@@ -26,8 +25,6 @@ const PROMPTS = [
     "The customer is demanding a _____.",
     "My secret note on this customer's account.",
     "The only way to get a refund is to...",
-    
-    // The "We Fired The Specialists" Tickets
     "Describe the 'Kangaroo Incident' that happened in the break room.",
     "Draft a breakup text... to your employer.",
     "Describe the emotional rollercoaster of a Monday morning.",
@@ -123,8 +120,6 @@ let gameState = 'lobby';
 let currentPrompt = "";
 let votes = {};
 let roundTimer = null;
-
-// Track who has already voted
 let voters = new Set();
 
 io.on('connection', (socket) => {
@@ -147,7 +142,6 @@ io.on('connection', (socket) => {
         votes = {};
         voters.clear();
 
-        // Reset submissions
         Object.keys(players).forEach(id => {
             players[id].submission = null;
             players[id].hand = [];
@@ -159,7 +153,6 @@ io.on('connection', (socket) => {
 
         io.emit('gameStarted', { prompt: currentPrompt, time: 90 });
         
-        // Start 90s Timer
         if (roundTimer) clearInterval(roundTimer);
         let timeLeft = 90;
         roundTimer = setInterval(() => {
@@ -177,7 +170,6 @@ io.on('connection', (socket) => {
             players[socket.id].submission = noteArray; 
             io.emit('playerSubmitted', socket.id);
             
-            // Check if everyone has submitted
             const allSubmitted = Object.values(players).every(p => p.submission !== null);
             if(allSubmitted && Object.keys(players).length > 0) {
                 clearInterval(roundTimer);
@@ -187,11 +179,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('submitVote', (targetId) => {
-        // --- FIXED: ALLOW SELF VOTING FOR TESTING ---
-        // We only check if YOU have voted before, not WHO you voted for.
         if (voters.has(socket.id)) return; 
-
-        console.log(`Vote registered: ${socket.id} voted for ${targetId}`);
 
         if(!votes[targetId]) votes[targetId] = 0;
         votes[targetId]++;
@@ -214,7 +202,6 @@ io.on('connection', (socket) => {
 
 function startVotingPhase() {
     gameState = 'voting';
-    // Only send submissions that actually exist
     const subList = Object.values(players)
         .filter(p => p.submission)
         .map(p => ({ id: p.id, note: p.submission }));
@@ -228,42 +215,46 @@ function endRound() {
     let maxVotes = -1;
     let winners = [];
     
-    // Find highest vote count
+    // Find Max Votes
     Object.keys(votes).forEach(id => {
-        if(votes[id] > maxVotes) {
-            maxVotes = votes[id];
-        }
+        if(votes[id] > maxVotes) maxVotes = votes[id];
     });
 
-    // Find everyone who tied for first place
+    // Find ALL players who have that score
     Object.keys(votes).forEach(id => {
-        if(votes[id] === maxVotes) {
-            winners.push(id);
-        }
+        if(votes[id] === maxVotes) winners.push(id);
     });
 
-    // Pick a random winner from the ties
-    let winnerId = null;
-    if (winners.length > 0) {
-        winnerId = winners[Math.floor(Math.random() * winners.length)];
+    let resultData = {
+        scores: players,
+        isTie: false,
+        winnerName: "",
+        winnerNote: []
+    };
+
+    if (winners.length > 1) {
+        // --- IT IS A TIE ---
+        resultData.isTie = true;
+        resultData.winnerName = winners.map(id => players[id] ? players[id].name : "Unknown").join(" & ");
+        // Give points to all tied players
+        winners.forEach(id => {
+            if(players[id]) players[id].score++;
+        });
+    } else if (winners.length === 1) {
+        // --- SINGLE WINNER ---
+        const wId = winners[0];
+        if(players[wId]) {
+            players[wId].score++;
+            resultData.winnerName = players[wId].name;
+            resultData.winnerNote = players[wId].submission;
+        }
+    } else {
+        // --- NO VOTES CAST ---
+        resultData.isTie = true;
+        resultData.winnerName = "Nobody (No Votes)";
     }
 
-    let winnerName = "Nobody";
-    let winnerNote = [];
-    
-    if(winnerId && players[winnerId]) {
-        players[winnerId].score += 1;
-        winnerName = players[winnerId].name;
-        winnerNote = players[winnerId].submission;
-    }
-
-    console.log("Round Over. Winner:", winnerName);
-
-    io.emit('roundEnded', { 
-        winner: winnerName,
-        note: winnerNote,
-        scores: players
-    });
+    io.emit('roundEnded', resultData);
 }
 
 const PORT = process.env.PORT || 3000;

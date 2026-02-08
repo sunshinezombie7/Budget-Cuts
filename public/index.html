@@ -46,30 +46,58 @@
         .screen { display: none; max-width: 900px; margin: 0 auto; }
         .active { display: block; }
 
-        /* --- THE MAGNETS --- */
+        /* --- THE MAGNETS (Pinned Paper Scraps) --- */
         .magnet {
             display: inline-block;
-            padding: 5px 12px;
-            margin: 6px;
+            padding: 8px 15px;
+            margin: 8px;
             cursor: grab;
             user-select: none;
-            box-shadow: 4px 4px 8px rgba(0,0,0,0.3);
+            box-shadow: 3px 3px 5px rgba(0,0,0,0.4); /* Shadow on cork */
             transition: transform 0.1s, box-shadow 0.1s;
+            position: relative; /* Needed for the pin */
         }
+        
+        /* THE PUSH PIN / STAPLE EFFECT */
+        .magnet::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle at 30% 30%, #e0e0e0, #888); /* Silver tack head */
+            border-radius: 50%;
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+            pointer-events: none;
+        }
+        
         .magnet:hover { 
             transform: scale(1.1) rotate(0deg) !important; 
             z-index: 100;
-            box-shadow: 10px 10px 20px rgba(0,0,0,0.4);
+            box-shadow: 15px 15px 25px rgba(0,0,0,0.5); /* Lifts off board */
         }
         .magnet:active { cursor: grabbing; transform: scale(0.9); }
 
-        /* --- CONTAINERS --- */
+        /* --- CORKBOARD CONTAINER --- */
         #corkboard {
-            background: url('https://www.transparenttextures.com/patterns/cork-board.png'), #a0522d;
-            border: 15px solid #d4c4a8;
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.7), 5px 5px 15px rgba(0,0,0,0.3);
+            /* Realistic Dark Cork Texture */
+            background-color: #6d4c41; 
+            background-image: url('https://www.transparenttextures.com/patterns/cork-board.png');
+            
+            /* WOOD FRAME */
+            border: 25px solid #3e2723; /* Dark Walnut Wood */
+            border-radius: 8px;
+            
+            /* DEPTH EFFECTS */
+            box-shadow: 
+                inset 0 0 50px rgba(0,0,0,0.8), /* Inner vignette (shadow inside frame) */
+                inset 2px 2px 5px rgba(0,0,0,0.5), /* Inner bevel */
+                10px 10px 30px rgba(0,0,0,0.6); /* Drop shadow on wall */
+                
             padding: 40px;
-            min-height: 200px;
+            min-height: 250px;
             margin-bottom: 30px;
             display: flex;
             flex-wrap: wrap;
@@ -79,19 +107,20 @@
             position: relative;
         }
         
+        /* THEME STAMP ON CORK */
         #corkboard::after {
             content: 'DEPT. OF EVERYTHING';
             position: absolute;
-            top: 15%;
-            left: 10%;
-            font-size: 3rem;
-            color: rgba(0, 0, 0, 0.1);
+            bottom: 20px;
+            right: 20px;
+            font-size: 2.5rem;
+            color: rgba(50, 20, 0, 0.15); /* Burnt-in look */
             font-family: 'Special Elite', cursive;
-            transform: rotate(-10deg);
+            transform: rotate(-5deg);
             pointer-events: none;
             font-weight: bold;
-            border: 5px solid rgba(0, 0, 0, 0.1);
-            padding: 10px 20px;
+            border: 5px double rgba(50, 20, 0, 0.15);
+            padding: 5px 20px;
         }
 
         #wordBank {
@@ -101,21 +130,25 @@
             border: 3px dashed #8c7b5d;
             min-height: 250px;
             transform: rotate(0.5deg);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
         }
 
         /* --- UI ELEMENTS --- */
         .vote-card {
             background: #fff;
-            border: 1px solid #999;
+            border: 1px solid #ccc;
             margin: 20px auto;
-            padding: 25px;
+            padding: 30px;
             cursor: pointer;
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
             max-width: 700px;
             transform: rotate(-1deg);
             transition: all 0.2s;
+            /* Make vote cards look like official documents */
+            background-image: linear-gradient(#eee 1px, transparent 1px);
+            background-size: 100% 2em;
         }
-        .vote-card:hover { transform: scale(1.02) rotate(1deg); border-color: #000; box-shadow: 10px 10px 20px rgba(0,0,0,0.3); }
+        .vote-card:hover { transform: scale(1.02) rotate(1deg); border-color: #000; box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
 
         button {
             padding: 15px 30px;
@@ -153,7 +186,6 @@
             transform: rotate(-1deg);
         }
         
-        /* Host Only Button Class */
         .host-only { display: none; }
     </style>
 </head>
@@ -183,8 +215,8 @@
         
         <h3>YOUR RESPONSE:</h3>
         <div id="corkboard">
-            <span style="color:rgba(255,255,255,0.7); font-style:italic; font-size: 1.2rem; background:rgba(0,0,0,0.5); padding: 5px;" id="emptyMsg">
-                Drag scraps here to answer the ticket...
+            <span style="color:rgba(255,255,255,0.8); font-style:italic; font-size: 1.4rem; background:rgba(0,0,0,0.6); padding: 10px; border-radius:5px;" id="emptyMsg">
+                Pin scraps here to answer the ticket...
             </span>
         </div>
         
@@ -205,7 +237,7 @@
         <h1>TICKET STATUS</h1>
         <div class="prompt-box" id="winnerName" style="background:#fbc02d; color:#000;"></div>
         
-        <div id="winningNote" style="padding: 40px; background: url('https://www.transparenttextures.com/patterns/cork-board.png'), #a0522d; border: 15px solid #d4c4a8; box-shadow: inset 0 0 30px rgba(0,0,0,0.6); margin: 30px auto; max-width: 700px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; min-height: 150px; align-items: center;"></div>
+        <div id="winningNote" style="padding: 40px; background: url('https://www.transparenttextures.com/patterns/cork-board.png'), #6d4c41; border: 20px solid #3e2723; box-shadow: inset 0 0 30px rgba(0,0,0,0.8); margin: 30px auto; max-width: 700px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; min-height: 150px; align-items: center; border-radius: 8px;"></div>
         
         <h3>EMPLOYEE PERFORMANCE</h3>
         <ul id="scoreList" style="list-style: none; padding:0; font-size: 1.3rem;"></ul>
@@ -223,12 +255,19 @@
             }
             
             const styles = [
+                // Style 1: Newsprint
                 { bg: '#fdfbf7', color: '#111', font: "'Tinos', serif", weight: '400', trans: 'none', border: 'none' },
+                // Style 2: Bold Headline
                 { bg: '#ffffff', color: '#000', font: "'Oswald', sans-serif", weight: '700', trans: 'uppercase', border: 'none' },
+                // Style 3: Inverted Black
                 { bg: '#111111', color: '#fdfbf7', font: "'Oswald', sans-serif", weight: '400', trans: 'uppercase', border: 'none' },
+                // Style 4: Pink Tabloid
                 { bg: '#ff80ab', color: '#000', font: "'Oswald', sans-serif", weight: '700', trans: 'uppercase', border: 'none' },
+                // Style 5: Cutout Note
                 { bg: '#ffeb3b', color: '#000', font: "'Special Elite', cursive", weight: '700', trans: 'none', border: '1px dashed #000' },
+                // Style 6: Blue Header
                 { bg: '#80d8ff', color: '#000', font: "'Tinos', serif", weight: '700', trans: 'none', border: '2px dotted #000' },
+                // Style 7: Red Warning
                 { bg: '#d32f2f', color: '#fff', font: "'Impact', sans-serif", weight: '400', trans: 'uppercase', border: 'none' }
             ];
 
@@ -293,7 +332,7 @@
 
             Object.values(data.players).forEach(p => {
                 const li = document.createElement('li');
-                li.innerHTML = `<span style="background:#fff; font-family:'Permanent Marker'; padding: 5px 15px; border: 2px solid #333; transform: rotate(${Math.random()*4-2}deg); display:inline-block; font-size:1.4rem;">${p.name} ${p.submission ? '✅' : ''} ${p.id === data.hostId ? '👑' : ''}</span>`;
+                li.innerHTML = `<span style="background:#fff; font-family:'Permanent Marker'; padding: 5px 15px; border: 2px solid #333; transform: rotate(${Math.random()*4-2}deg); display:inline-block; font-size:1.4rem; box-shadow:3px 3px 0 rgba(0,0,0,0.2);">${p.name} ${p.submission ? '✅' : ''} ${p.id === data.hostId ? '👑' : ''}</span>`;
                 li.style.margin = '10px 0';
                 list.appendChild(li);
             });
@@ -338,7 +377,7 @@
 
             // Draw Note (Board)
             if(myNote.length === 0) {
-                board.innerHTML = '<span style="color:rgba(255,255,255,0.7); font-style:italic; font-size: 1.2rem; background:rgba(0,0,0,0.5); padding: 5px;">Drag scraps here...</span>';
+                board.innerHTML = '<span style="color:rgba(255,255,255,0.8); font-style:italic; font-size: 1.4rem; background:rgba(0,0,0,0.6); padding: 10px; border-radius:5px;">Pin scraps here...</span>';
             } else {
                 myNote.forEach((word, index) => {
                     const span = document.createElement('span');

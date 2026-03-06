@@ -5,196 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BUDGET CUTS: DEPT OF EVERYTHING</title>
     <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Oswald:wght@700&family=Permanent+Marker&family=Special+Elite&family=Tinos:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        /* --- GLOBAL --- */
-        body { 
-            font-family: 'Special Elite', monospace; 
-            background-color: #d8cba0;
-            background-image: url('https://www.transparenttextures.com/patterns/crumpled-paper.png');
-            text-align: center; 
-            margin: 0; 
-            padding: 20px;
-            color: #333;
-        }
-        
-        h1 { 
-            font-family: 'Abril Fatface', cursive; 
-            font-size: 3.5rem; 
-            letter-spacing: 2px;
-            color: #111;
-            text-transform: uppercase; 
-            display: inline-block; 
-            padding: 10px 40px; 
-            background: #fff;
-            clip-path: polygon(3% 0%, 97% 5%, 100% 85%, 95% 100%, 5% 95%, 0% 10%);
-            box-shadow: 10px 10px 0 rgba(0,0,0,0.8); 
-            transform: rotate(-3deg); 
-            margin-bottom: 20px;
-        }
-        
-        h3 {
-            background: #111;
-            color: #fff;
-            font-family: 'Oswald', sans-serif;
-            text-transform: uppercase;
-            display: inline-block;
-            padding: 5px 15px;
-            transform: rotate(1deg);
-            box-shadow: 4px 4px 0 rgba(255,255,255,0.3);
-        }
-
-        .screen { display: none; max-width: 900px; margin: 0 auto; }
-        .active { display: block; }
-
-        /* --- THE MAGNETS (Pinned Paper Scraps) --- */
-        .magnet {
-            display: inline-block;
-            padding: 8px 15px;
-            margin: 8px;
-            cursor: grab;
-            user-select: none;
-            box-shadow: 3px 3px 5px rgba(0,0,0,0.4); /* Shadow on cork */
-            transition: transform 0.1s, box-shadow 0.1s;
-            position: relative; /* Needed for the pin */
-        }
-        
-        /* THE PUSH PIN / STAPLE EFFECT */
-        .magnet::after {
-            content: '';
-            position: absolute;
-            top: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 8px;
-            height: 8px;
-            background: radial-gradient(circle at 30% 30%, #e0e0e0, #888); /* Silver tack head */
-            border-radius: 50%;
-            box-shadow: 1px 1px 2px rgba(0,0,0,0.6);
-            pointer-events: none;
-        }
-        
-        .magnet:hover { 
-            transform: scale(1.1) rotate(0deg) !important; 
-            z-index: 100;
-            box-shadow: 15px 15px 25px rgba(0,0,0,0.5); /* Lifts off board */
-        }
-        .magnet:active { cursor: grabbing; transform: scale(0.9); }
-
-        /* --- CORKBOARD CONTAINER --- */
-        #corkboard {
-            /* Realistic Dark Cork Texture */
-            background-color: #6d4c41; 
-            background-image: url('https://www.transparenttextures.com/patterns/cork-board.png');
-            
-            /* WOOD FRAME */
-            border: 25px solid #3e2723; /* Dark Walnut Wood */
-            border-radius: 8px;
-            
-            /* DEPTH EFFECTS */
-            box-shadow: 
-                inset 0 0 50px rgba(0,0,0,0.8), /* Inner vignette (shadow inside frame) */
-                inset 2px 2px 5px rgba(0,0,0,0.5), /* Inner bevel */
-                10px 10px 30px rgba(0,0,0,0.6); /* Drop shadow on wall */
-                
-            padding: 40px;
-            min-height: 250px;
-            margin-bottom: 30px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            position: relative;
-        }
-        
-        /* THEME STAMP ON CORK */
-        #corkboard::after {
-            content: 'DEPT. OF EVERYTHING';
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            font-size: 2.5rem;
-            color: rgba(50, 20, 0, 0.15); /* Burnt-in look */
-            font-family: 'Special Elite', cursive;
-            transform: rotate(-5deg);
-            pointer-events: none;
-            font-weight: bold;
-            border: 5px double rgba(50, 20, 0, 0.15);
-            padding: 5px 20px;
-        }
-
-        #wordBank {
-            background-color: #e8d8b8;
-            background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');
-            padding: 25px;
-            border: 3px dashed #8c7b5d;
-            min-height: 250px;
-            transform: rotate(0.5deg);
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
-        }
-
-        /* --- UI ELEMENTS --- */
-        .vote-card {
-            background: #fff;
-            border: 1px solid #ccc;
-            margin: 20px auto;
-            padding: 30px;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            max-width: 700px;
-            transform: rotate(-1deg);
-            transition: all 0.2s;
-            /* Make vote cards look like official documents */
-            background-image: linear-gradient(#eee 1px, transparent 1px);
-            background-size: 100% 2em;
-        }
-        .vote-card:hover { transform: scale(1.02) rotate(1deg); border-color: #000; box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
-
-        button {
-            padding: 15px 30px;
-            font-size: 1.3rem;
-            font-family: 'Oswald', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            background: #222;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            box-shadow: 6px 6px 0 #999;
-            transform: rotate(-1deg);
-            margin: 10px;
-        }
-        button:hover { top: -2px; box-shadow: 8px 8px 0 #999; background: #000; position: relative; }
-        
-        input { 
-            padding: 15px; font-size: 1.2rem; 
-            border: 4px solid #111; 
-            background: #fff; font-family: 'Special Elite', monospace;
-        }
-        
-        .timer { font-size: 4rem; color: #d32f2f; font-family: 'Abril Fatface', cursive; margin: 10px 0; text-shadow: 2px 2px 0 #fff; }
-        
-        .prompt-box { 
-            background: #111; 
-            color: #fff; 
-            padding: 20px; 
-            font-size: 1.5rem; 
-            font-family: 'Special Elite', monospace;
-            margin: 0 auto 30px auto;
-            max-width: 800px;
-            clip-path: polygon(0% 0%, 100% 2%, 98% 100%, 2% 98%);
-            transform: rotate(-1deg);
-        }
-        
-        .host-only { display: none; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="lobbyScreen" class="screen active">
         <h1>BUDGET CUTS</h1>
         <br>
-        <p style="font-size: 1.3rem; background:#fff; display:inline-block; padding:15px; transform:rotate(1deg); border: 2px solid #000; max-width: 700px;">
+        <p class="notice-box">
             <b>NOTICE:</b> Due to budget cuts, all other departments have been fired. 
             <br>YOU must now answer ALL incoming tickets.
             <br>(And we sold the keyboards, so use these magazine scraps).
@@ -206,7 +24,7 @@
         <br><br>
         <h3>AVAILABLE STAFF:</h3>
         <ul id="lobbyList" style="list-style: none; padding: 0;"></ul>
-        <button id="startBtn" class="host-only" onclick="startGame()" style="background:#2e7d32; box-shadow: 6px 6px 0 #1b5e20;">OPEN TICKET QUEUE</button>
+        <button id="startBtn" class="host-only" onclick="startGame()">OPEN TICKET QUEUE</button>
     </div>
 
     <div id="gameScreen" class="screen">
@@ -215,12 +33,12 @@
         
         <h3>YOUR RESPONSE:</h3>
         <div id="corkboard">
-            <span style="color:rgba(255,255,255,0.8); font-style:italic; font-size: 1.4rem; background:rgba(0,0,0,0.6); padding: 10px; border-radius:5px;" id="emptyMsg">
+            <span id="emptyMsg" class="corkboard-placeholder">
                 Pin scraps here to answer the ticket...
             </span>
         </div>
         
-        <button onclick="submitNote()" style="margin-bottom:25px; background:#d32f2f; box-shadow: 6px 6px 0 #8b0000;">RESOLVE TICKET</button>
+        <button onclick="submitNote()" class="btn-resolve">RESOLVE TICKET</button>
 
         <h3>OFFICE SCRAPS:</h3>
         <div id="wordBank"></div>
@@ -228,7 +46,7 @@
 
     <div id="votingScreen" class="screen">
         <h1>QUALITY ASSURANCE</h1>
-        <p style="background:#fff; display:inline-block; padding:5px;">SELECT THE MOST "PROFESSIONAL" RESPONSE:</p>
+        <p class="ui-subtext">SELECT THE MOST "PROFESSIONAL" RESPONSE:</p>
         <div class="prompt-box" id="votePrompt"></div>
         <div id="submissionsList"></div>
     </div>
@@ -237,7 +55,7 @@
         <h1>TICKET STATUS</h1>
         <div class="prompt-box" id="winnerName" style="background:#fbc02d; color:#000;"></div>
         
-        <div id="winningNote" style="padding: 40px; background: url('https://www.transparenttextures.com/patterns/cork-board.png'), #6d4c41; border: 20px solid #3e2723; box-shadow: inset 0 0 30px rgba(0,0,0,0.8); margin: 30px auto; max-width: 700px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; min-height: 150px; align-items: center; border-radius: 8px;"></div>
+        <div id="winningNote" class="winning-note-container"></div>
         
         <h3>EMPLOYEE PERFORMANCE</h3>
         <ul id="scoreList" style="list-style: none; padding:0; font-size: 1.3rem;"></ul>
@@ -246,236 +64,6 @@
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-        // --- STYLE GENERATOR ---
-        function getWordStyle(word) {
-            let hash = 0;
-            for (let i = 0; i < word.length; i++) {
-                hash = word.charCodeAt(i) + ((hash << 5) - hash);
-            }
-            
-            const styles = [
-                // Style 1: Newsprint
-                { bg: '#fdfbf7', color: '#111', font: "'Tinos', serif", weight: '400', trans: 'none', border: 'none' },
-                // Style 2: Bold Headline
-                { bg: '#ffffff', color: '#000', font: "'Oswald', sans-serif", weight: '700', trans: 'uppercase', border: 'none' },
-                // Style 3: Inverted Black
-                { bg: '#111111', color: '#fdfbf7', font: "'Oswald', sans-serif", weight: '400', trans: 'uppercase', border: 'none' },
-                // Style 4: Pink Tabloid
-                { bg: '#ff80ab', color: '#000', font: "'Oswald', sans-serif", weight: '700', trans: 'uppercase', border: 'none' },
-                // Style 5: Cutout Note
-                { bg: '#ffeb3b', color: '#000', font: "'Special Elite', cursive", weight: '700', trans: 'none', border: '1px dashed #000' },
-                // Style 6: Blue Header
-                { bg: '#80d8ff', color: '#000', font: "'Tinos', serif", weight: '700', trans: 'none', border: '2px dotted #000' },
-                // Style 7: Red Warning
-                { bg: '#d32f2f', color: '#fff', font: "'Impact', sans-serif", weight: '400', trans: 'uppercase', border: 'none' }
-            ];
-
-            const index = Math.abs(hash) % styles.length;
-            const s = styles[index];
-            const rot = (Math.abs(hash * 2) % 10) - 5; 
-            const clip = `polygon(${2+Math.abs(hash)%3}% ${0+Math.abs(hash)%4}%, ${96+Math.abs(hash)%3}% ${2+Math.abs(hash)%2}%, ${98+Math.abs(hash)%2}% ${95+Math.abs(hash)%3}%, ${2+Math.abs(hash)%2}% ${98+Math.abs(hash)%2}%)`;
-
-            return `
-                background:${s.bg}; 
-                color:${s.color}; 
-                font-family:${s.font}; 
-                font-weight:${s.weight}; 
-                text-transform:${s.trans}; 
-                border:${s.border};
-                transform: rotate(${rot}deg);
-                clip-path: ${clip};
-            `;
-        }
-
-        // --- GAME LOGIC ---
-        const socket = io();
-        let myHand = [];
-        let myNote = [];
-
-        // ENTER KEY LISTENER
-        document.getElementById('username').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') joinGame();
-        });
-
-        function joinGame() {
-            const name = document.getElementById('username').value;
-            if(name) {
-                socket.emit('joinGame', name);
-            }
-        }
-
-        socket.on('joinError', (msg) => {
-            alert(msg);
-        });
-
-        function startGame() {
-            socket.emit('startGame');
-        }
-
-        function startNextRound() {
-            socket.emit('startNextRound');
-        }
-
-        socket.on('updateLobby', (data) => {
-            const list = document.getElementById('lobbyList');
-            list.innerHTML = '';
-            
-            // Check if I am host
-            const isHost = (socket.id === data.hostId);
-            const startBtn = document.getElementById('startBtn');
-            if(isHost) {
-                startBtn.style.display = 'inline-block';
-            } else {
-                startBtn.style.display = 'none';
-            }
-
-            Object.values(data.players).forEach(p => {
-                const li = document.createElement('li');
-                li.innerHTML = `<span style="background:#fff; font-family:'Permanent Marker'; padding: 5px 15px; border: 2px solid #333; transform: rotate(${Math.random()*4-2}deg); display:inline-block; font-size:1.4rem; box-shadow:3px 3px 0 rgba(0,0,0,0.2);">${p.name} ${p.submission ? '✅' : ''} ${p.id === data.hostId ? '👑' : ''}</span>`;
-                li.style.margin = '10px 0';
-                list.appendChild(li);
-            });
-        });
-
-        socket.on('gameStarted', (data) => {
-            showScreen('gameScreen');
-            document.getElementById('promptText').textContent = data.prompt;
-            document.getElementById('timer').textContent = data.time;
-        });
-
-        socket.on('timerUpdate', (t) => {
-            document.getElementById('timer').textContent = t;
-        });
-
-        socket.on('dealHand', (data) => {
-            myHand = data.hand;
-            myNote = [];
-            renderBoard();
-        });
-
-        function renderBoard() {
-            const bank = document.getElementById('wordBank');
-            const board = document.getElementById('corkboard');
-            bank.innerHTML = '';
-            board.innerHTML = '';
-
-            // Draw Hand (Bank)
-            myHand.forEach((word, index) => {
-                const span = document.createElement('span');
-                span.className = 'magnet';
-                span.textContent = word;
-                span.style.cssText = getWordStyle(word);
-                
-                span.onclick = () => {
-                    myHand.splice(index, 1);
-                    myNote.push(word);
-                    renderBoard();
-                };
-                bank.appendChild(span);
-            });
-
-            // Draw Note (Board)
-            if(myNote.length === 0) {
-                board.innerHTML = '<span style="color:rgba(255,255,255,0.8); font-style:italic; font-size: 1.4rem; background:rgba(0,0,0,0.6); padding: 10px; border-radius:5px;">Pin scraps here...</span>';
-            } else {
-                myNote.forEach((word, index) => {
-                    const span = document.createElement('span');
-                    span.className = 'magnet';
-                    span.textContent = word;
-                    span.style.cssText = getWordStyle(word); 
-                    
-                    span.onclick = () => {
-                        myNote.splice(index, 1);
-                        myHand.push(word);
-                        renderBoard();
-                    };
-                    board.appendChild(span);
-                });
-            }
-        }
-
-        function submitNote() {
-            if(myNote.length > 0) {
-                socket.emit('submitNote', myNote);
-                document.getElementById('corkboard').innerHTML = "<h2 style='background:#fff; padding:10px; border:3px solid #000; transform:rotate(-2deg); display:inline-block;'>RESPONSE SENT.</h2>";
-                document.getElementById('wordBank').style.display = 'none';
-            }
-        }
-
-        socket.on('startVoting', (submissions) => {
-            showScreen('votingScreen');
-            document.getElementById('votePrompt').textContent = document.getElementById('promptText').textContent;
-            const list = document.getElementById('submissionsList');
-            list.innerHTML = '';
-
-            submissions.forEach(sub => {
-                const div = document.createElement('div');
-                div.className = 'vote-card';
-                div.innerHTML = sub.note.map(w => {
-                    return `<span style="display:inline-block; padding:4px 8px; margin:4px; box-shadow:2px 2px 5px rgba(0,0,0,0.2); ${getWordStyle(w)} font-size:1rem;">${w}</span>`
-                }).join(' ');
-                
-                div.onclick = () => {
-                    socket.emit('submitVote', sub.id);
-                    list.innerHTML = "<h2 style='background:#fff; padding:10px; border:3px solid #000; transform:rotate(-2deg); display:inline-block;'>REVIEW FILED.</h2>";
-                };
-                list.appendChild(div);
-            });
-        });
-
-        socket.on('roundEnded', (data) => {
-            showScreen('resultScreen');
-            const winnerNameBox = document.getElementById('winnerName');
-            const noteDiv = document.getElementById('winningNote');
-            
-            // Handle Host/Next Round Button visibility
-            const isHost = (socket.id === data.hostId);
-            const nextBtn = document.getElementById('nextRoundBtn');
-            const waitMsg = document.getElementById('waitingMsg');
-            
-            if (isHost) {
-                nextBtn.style.display = 'inline-block';
-                waitMsg.style.display = 'none';
-            } else {
-                nextBtn.style.display = 'none';
-                waitMsg.style.display = 'block';
-            }
-
-            if (data.isTie) {
-                winnerNameBox.textContent = "ADMINISTRATIVE DEADLOCK: " + data.winnerName;
-                winnerNameBox.style.background = "#999"; 
-                noteDiv.innerHTML = "<h2 style='background:#fff; padding:15px; border:2px solid #000; transform:rotate(2deg);'>BUDGET FROZEN.<br>(VOTES WERE TIED)</h2>";
-            } else {
-                winnerNameBox.textContent = "BEST EMPLOYEE: " + data.winnerName;
-                winnerNameBox.style.background = "#fbc02d"; 
-                
-                if(data.winnerNote && data.winnerNote.length > 0) {
-                    noteDiv.innerHTML = data.winnerNote.map(w => `<span style="display:inline-block; padding:8px 15px; margin:5px; box-shadow:4px 4px 10px rgba(0,0,0,0.4); ${getWordStyle(w)} font-size:1.5rem;">${w}</span>`).join(' ');
-                } else {
-                    noteDiv.innerHTML = "<span style='background:#fff; padding:10px;'>File Corrupted.</span>";
-                }
-            }
-
-            const scoreList = document.getElementById('scoreList');
-            scoreList.innerHTML = '';
-            Object.values(data.scores).sort((a,b) => b.score - a.score).forEach(p => {
-                const li = document.createElement('li');
-                li.innerHTML = `<span style="background:#fff; font-family:'Permanent Marker'; padding: 5px 15px; border: 2px solid #333; transform: rotate(${Math.random()*4-2}deg); display:inline-block; margin: 5px;">${p.name}: ${p.score}</span>`;
-                scoreList.appendChild(li);
-            });
-        });
-
-        function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            if(id === 'lobbyScreen') {
-                 document.getElementById('wordBank').style.display = 'block';
-            }
-            if(id === 'gameScreen') {
-                document.getElementById('wordBank').style.display = 'block';
-            }
-        }
-    </script>
+    <script src="client.js"></script>
 </body>
 </html>

@@ -1,41 +1,83 @@
-<div id="gameScreen" class="screen game-container">
-    <div class="game-header">
-        <div class="timer" id="timer">90</div>
-        <div class="prompt-box" id="promptText">LOADING TICKET...</div>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUDGET CUTS: DEPT OF EVERYTHING</title>
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Oswald:wght@700&family=Permanent+Marker&family=Special+Elite&family=Tinos:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-    <div class="workspace">
-        <h3>YOUR RESPONSE:</h3>
-        <div id="corkboard">
-            <span id="emptyMsg" class="corkboard-placeholder">Pin scraps here...</span>
+    <div id="loginScreen" class="screen active">
+        <h1>BUDGET CUTS</h1>
+        <div class="notice-box">
+            <b>NOTICE:</b> Due to budget cuts, all other departments have been fired. 
+            <br>YOU must now answer ALL incoming tickets.
         </div>
-        <button onclick="submitNote()" class="btn-resolve">RESOLVE TICKET</button>
+        <br><br>
+        <input type="text" id="username" placeholder="EMPLOYEE ID">
+        <br><br>
+        <button onclick="joinGame()">CLOCK IN</button>
     </div>
 
-    <div class="scraps-drawer">
-        <h3>OFFICE SCRAPS:</h3>
-        <div id="wordBank"></div>
+    <div id="lobbyScreen" class="screen">
+        <div class="water-bubbler">
+            <div class="bubbler-tank"></div>
+            <div class="bubbler-base"></div>
+        </div>
+
+        <h1>THE WATER COOLER</h1>
+        <p>Waiting for the rest of the skeleton crew to arrive...</p>
+        
+        <div class="staff-board">
+            <h3>STAFF LOITERING:</h3>
+            <ul id="lobbyList" style="list-style: none; padding: 0;"></ul>
+        </div>
+
+        <button id="startBtn" class="host-only" onclick="startGame()">START SHIFT</button>
     </div>
-</div> <div id="votingScreen" class="screen">
-    <h1>QUALITY ASSURANCE</h1>
-    <p class="ui-subtext">SELECT THE MOST "PROFESSIONAL" RESPONSE:</p>
-    <div class="prompt-box" id="votePrompt"></div>
-    <div id="submissionsList"></div>
-</div>
 
-<div id="resultScreen" class="screen">
-    <h1>TICKET STATUS</h1>
-    <div class="prompt-box" id="winnerName" style="background:#fbc02d; color:#000;"></div>
-    
-    <div id="winningNote" class="winning-note-container"></div>
-    
-    <h3>EMPLOYEE PERFORMANCE</h3>
-    <ul id="scoreList" style="list-style: none; padding:0; font-size: 1.3rem;"></ul>
-    <button id="nextRoundBtn" class="host-only" onclick="startNextRound()">OPEN NEXT TICKET</button>
-    <p id="waitingMsg" style="display:none; font-weight:bold;">WAITING FOR HOST TO OPEN NEXT TICKET...</p>
-</div>
+    <div id="gameScreen" class="screen game-container">
+        <div class="game-header">
+            <div class="timer" id="timer">90</div>
+            <div class="prompt-box" id="promptText">LOADING TICKET...</div>
+        </div>
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="client.js"></script>
+        <div class="workspace">
+            <h3>YOUR RESPONSE:</h3>
+            <div id="corkboard">
+                <span id="emptyMsg" class="corkboard-placeholder">Pin scraps here...</span>
+            </div>
+            <button onclick="submitNote()" class="btn-resolve">RESOLVE TICKET</button>
+        </div>
+
+        <div class="scraps-drawer">
+            <h3>OFFICE SCRAPS:</h3>
+            <div id="wordBank"></div>
+        </div>
+    </div>
+
+    <div id="votingScreen" class="screen">
+        <h1>QUALITY ASSURANCE</h1>
+        <p class="ui-subtext">SELECT THE MOST "PROFESSIONAL" RESPONSE:</p>
+        <div class="prompt-box" id="votePrompt"></div>
+        <div id="submissionsList"></div>
+    </div>
+
+    <div id="resultScreen" class="screen">
+        <h1>TICKET STATUS</h1>
+        <div class="prompt-box" id="winnerName" style="background:#fbc02d; color:#000;"></div>
+        
+        <div id="winningNote" class="winning-note-container"></div>
+        
+        <h3>EMPLOYEE PERFORMANCE</h3>
+        <ul id="scoreList" style="list-style: none; padding:0; font-size: 1.3rem;"></ul>
+        <button id="nextRoundBtn" class="host-only" onclick="startNextRound()">OPEN NEXT TICKET</button>
+        <p id="waitingMsg" style="display:none; font-weight:bold;">WAITING FOR HOST TO OPEN NEXT TICKET...</p>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="client.js"></script>
 </body>
 </html>

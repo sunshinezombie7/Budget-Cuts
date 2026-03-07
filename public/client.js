@@ -186,7 +186,7 @@ socket.on('roundEnded', (data) => {
         winnerNameBox.style.background = "#999"; 
         noteDiv.innerHTML = "<h2 style='background:#fff; padding:15px; border:2px solid #000; transform:rotate(2deg);'>BUDGET FROZEN.<br>(VOTES WERE TIED)</h2>";
     } else {
-        winnerNameBox.textContent = "BEST EMPLOYEE: " + data.winnerName;
+        winnerNameBox.textContent = "MADE THE CUT: " + data.winnerName;
         winnerNameBox.style.background = "#fbc02d"; 
         
         if(data.winnerNote && data.winnerNote.length > 0) {

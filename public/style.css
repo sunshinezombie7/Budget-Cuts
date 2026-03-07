@@ -5,12 +5,14 @@ body {
     background-image: url('https://www.transparenttextures.com/patterns/crumpled-paper.png');
     text-align: center; 
     margin: 0; 
-    padding: 0; /* Changed to 0 to help layout */
+    padding: 0;
     color: #333;
-    overflow: hidden; /* Prevents whole page scrolling */
+    overflow: hidden; 
     height: 100vh;
     display: flex;
     flex-direction: column;
+    align-items: center; /* This fixes the "spread out" look */
+    justify-content: center;
 }
 
 h1 { 
@@ -42,13 +44,25 @@ h3 {
 
 .screen { 
     display: none; 
-    width: 100%; 
-    max-width: 900px; 
-    margin: 0 auto; 
-    height: 100vh; 
+    width: 90%; 
+    max-width: 800px; 
+    margin: auto; 
+    /* Remove fixed height 100vh from here so login looks normal */
 }
-.active { display: flex; flex-direction: column; }
 
+/* We only want the GAME screen to be full height */
+#gameScreen.active { 
+    display: flex; 
+    flex-direction: column; 
+    height: 95vh; 
+    max-width: 1200px; /* Give the game more room than the login */
+}
+
+.active { display: block; } /* Standard screens just stack naturally */
+
+/* Fix the inputs and buttons so they don't stretch to 100% width */
+input { width: 300px; margin: 10px auto; display: block; }
+button { display: inline-block; width: auto; min-width: 200px; }
 /* --- GAME LAYOUT (The "No-Scroll" Fix) --- */
 .game-container {
     display: flex;

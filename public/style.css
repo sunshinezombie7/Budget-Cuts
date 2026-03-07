@@ -71,6 +71,58 @@ h3 {
 }
 .magnet:active { cursor: grabbing; transform: scale(0.9); }
 
+/* --- WATER BUBBLER --- */
+.water-bubbler {
+    width: 60px;
+    margin: 20px auto;
+    position: relative;
+}
+
+.bubbler-tank {
+    width: 50px;
+    height: 70px;
+    background: rgba(173, 216, 230, 0.6); /* Translucent blue */
+    border-radius: 10px 10px 2px 2px;
+    border: 2px solid #999;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Water level animation */
+.bubbler-tank::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60%;
+    background: rgba(0, 191, 255, 0.4);
+    animation: bubble 3s ease-in-out infinite;
+}
+
+.bubbler-base {
+    width: 60px;
+    height: 40px;
+    background: #e0e0e0;
+    border: 2px solid #999;
+    border-radius: 2px;
+}
+
+@keyframes bubble {
+    0%, 100% { height: 60%; }
+    50% { height: 65%; }
+}
+
+/* --- STAFF BOARD --- */
+.staff-board {
+    background: #fff;
+    padding: 20px;
+    border: 8px solid #5d4037; /* Picture frame look */
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+    max-width: 400px;
+    margin: 20px auto;
+    transform: rotate(-1deg);
+}
+
 /* --- CORKBOARD --- */
 #corkboard {
     background-color: #6d4c41; 

@@ -157,9 +157,16 @@ socket.on('startVoting', (submissions) => {
     submissions.forEach(sub => {
         const div = document.createElement('div');
         div.className = 'vote-card';
-        div.innerHTML = sub.note.map(w => {
-            return `<span style="display:inline-block; padding:4px 8px; margin:4px; box-shadow:2px 2px 5px rgba(0,0,0,0.2); ${getWordStyle(w)} font-size:1rem;">${w}</span>`
-        }).join(' ');
+        
+        // Wrap the spans in a scrap-container div
+        const scrapsHtml = sub.note.map(w => {
+            return `<span style="display:inline-block; padding:4px 8px; margin:4px; ${getWordStyle(w)} font-size:0.9rem;">${w}</span>`
+        }).join('');
+
+        div.innerHTML = `
+            <div style="font-family:'Oswald'; font-size:0.8rem; color:#999; margin-bottom:5px;">OFFICIAL SUBMISSION:</div>
+            <div class="scrap-container">${scrapsHtml}</div>
+        `;
         
         div.onclick = () => {
             socket.emit('submitVote', sub.id);
@@ -190,12 +197,23 @@ socket.on('roundEnded', (data) => {
         winnerNameBox.style.background = "#fbc02d"; 
         
         if(data.winnerNote && data.winnerNote.length > 0) {
-            noteDiv.innerHTML = data.winnerNote.map(w => `<span style="display:inline-block; padding:8px 15px; margin:5px; box-shadow:4px 4px 10px rgba(0,0,0,0.4); ${getWordStyle(w)} font-size:1.5rem;">${w}</span>`).join(' ');
+            // We wrap the spans in a 'scrap-container' to keep them organized
+            const scrapsHtml = data.winnerNote.map(w => 
+                `<span style="display:inline-block; padding:6px 12px; margin:4px; ${getWordStyle(w)} font-size:1.3rem;">${w}</span>`
+            ).join('');
+
+            noteDiv.innerHTML = `
+                <div class="scrap-container" style="width: 100%; min-height: 80px;">
+                    ${scrapsHtml}
+                </div>
+                <div class="approved-stamp">APPROVED</div>
+            `;
         } else {
             noteDiv.innerHTML = "<span style='background:#fff; padding:10px;'>File Corrupted.</span>";
         }
     }
 
+    // Score list update logic remains the same below...
     const scoreList = document.getElementById('scoreList');
     scoreList.innerHTML = '';
     Object.values(data.scores).sort((a,b) => b.score - a.score).forEach(p => {

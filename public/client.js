@@ -41,24 +41,13 @@ function getWordStyle(word) {
 }
 
 function joinGame() {
-    const name = document.getElementById('username').value;
+    const nameInput = document.getElementById('username');
+    const name = nameInput.value.trim();
     if(name) {
         socket.emit('joinGame', name);
-        // Switch to the water cooler immediately while waiting for server confirmation
         showScreen('lobbyScreen'); 
     }
 }
-
-// Ensure this matches your server's event name
-socket.on('gameStarted', (data) => {
-    console.log("Game starting..."); // Debug line
-    showScreen('gameScreen');
-    document.getElementById('promptText').textContent = data.prompt;
-    document.getElementById('timer').textContent = data.time;
-    
-    // Safety check: make sure word bank is visible
-    document.getElementById('wordBank').style.display = 'flex';
-});
 
 function startGame() {
     socket.emit('startGame');
@@ -68,13 +57,28 @@ function startNextRound() {
     socket.emit('startNextRound');
 }
 
+// --- UPDATED GAME START LISTENER (MERGED) ---
+socket.on('gameStarted', (data) => {
+    console.log("Game Signal Received:", data);
+    showScreen('gameScreen');
+    
+    if(data) {
+        document.getElementById('promptText').textContent = data.prompt || "Incoming Ticket...";
+        document.getElementById('timer').textContent = data.time || "90";
+    }
+    
+    // Ensure word bank is visible for the new layout
+    const wb = document.getElementById('wordBank');
+    if(wb) wb.style.display = 'flex';
+});
+
 socket.on('updateLobby', (data) => {
     const list = document.getElementById('lobbyList');
     list.innerHTML = '';
     
     const isHost = (socket.id === data.hostId);
     const startBtn = document.getElementById('startBtn');
-    startBtn.style.display = isHost ? 'inline-block' : 'none';
+    if(startBtn) startBtn.style.display = isHost ? 'inline-block' : 'none';
 
     Object.values(data.players).forEach(p => {
         const li = document.createElement('li');
@@ -84,14 +88,9 @@ socket.on('updateLobby', (data) => {
     });
 });
 
-socket.on('gameStarted', (data) => {
-    showScreen('gameScreen');
-    document.getElementById('promptText').textContent = data.prompt;
-    document.getElementById('timer').textContent = data.time;
-});
-
 socket.on('timerUpdate', (t) => {
-    document.getElementById('timer').textContent = t;
+    const timerDisplay = document.getElementById('timer');
+    if(timerDisplay) timerDisplay.textContent = t;
 });
 
 socket.on('dealHand', (data) => {
@@ -103,6 +102,8 @@ socket.on('dealHand', (data) => {
 function renderBoard() {
     const bank = document.getElementById('wordBank');
     const board = document.getElementById('corkboard');
+    if(!bank || !board) return;
+
     bank.innerHTML = '';
     board.innerHTML = '';
 
@@ -177,13 +178,8 @@ socket.on('roundEnded', (data) => {
     const nextBtn = document.getElementById('nextRoundBtn');
     const waitMsg = document.getElementById('waitingMsg');
     
-    if (isHost) {
-        nextBtn.style.display = 'inline-block';
-        waitMsg.style.display = 'none';
-    } else {
-        nextBtn.style.display = 'none';
-        waitMsg.style.display = 'block';
-    }
+    if (nextBtn) nextBtn.style.display = isHost ? 'inline-block' : 'none';
+    if (waitMsg) waitMsg.style.display = isHost ? 'none' : 'block';
 
     if (data.isTie) {
         winnerNameBox.textContent = "ADMINISTRATIVE DEADLOCK: " + data.winnerName;
@@ -209,12 +205,21 @@ socket.on('roundEnded', (data) => {
     });
 });
 
+// --- UPDATED SHOWSCREEN FUNCTION ---
 function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const screens = document.querySelectorAll('.screen');
+    screens.forEach(s => {
+        s.classList.remove('active');
+        s.style.display = 'none'; 
+    });
+
     const target = document.getElementById(id);
-    if(target) target.classList.add('active');
+    if(target) {
+        target.classList.add('active');
+        // If it's the game, use flex for our split layout; others can use block
+        target.style.display = (id === 'gameScreen' || id === 'votingScreen') ? 'flex' : 'block';
+    }
     
-    // Manage body scrolling: only allow it on the lobby/results
     if(id === 'gameScreen') {
         document.body.style.overflow = 'hidden';
     } else {

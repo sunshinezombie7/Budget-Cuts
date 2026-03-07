@@ -169,6 +169,38 @@ h1 {
     50% { height: 75%; transform: scaleY(1.05); }
 }
 
+/* Container for scraps in the voting cards */
+.scrap-container {
+    background: #fff;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-bottom: 2px solid #ccc;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 10px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+}
+
+/* Enhancing the winning note container to look like a pinned file */
+.winning-note-container {
+    padding: 30px; 
+    background: url('https://www.transparenttextures.com/patterns/cork-board.png'), #6d4c41; 
+    border: 15px solid #3e2723; 
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 10px 10px 20px rgba(0,0,0,0.4); 
+    margin: 20px auto; 
+    max-width: 600px; 
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+    gap: 10px; 
+    min-height: 120px; 
+    align-items: center; 
+    border-radius: 4px;
+    position: relative;
+}
+
 /* --- UI ELEMENTS --- */
 .notice-box { font-size: 1.1rem; background:#fff; display:inline-block; padding:15px; border: 2px solid #000; transform: rotate(1deg); max-width: 600px; margin: 0 auto;}
 input { width: 300px; margin: 15px auto; padding: 12px; font-family: 'Special Elite'; border: 3px solid #111; }

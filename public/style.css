@@ -1,4 +1,4 @@
-/* --- GLOBAL (Updated for No-Scroll) --- */
+/* --- GLOBAL --- */
 body { 
     font-family: 'Special Elite', monospace; 
     background-color: #d8cba0;
@@ -11,7 +11,7 @@ body {
     height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: center; /* This fixes the "spread out" look */
+    align-items: center;
     justify-content: center;
 }
 
@@ -30,56 +30,27 @@ h1 {
     margin: 10px 0;
 }
 
-h3 {
-    background: #111;
-    color: #fff;
-    font-family: 'Oswald', sans-serif;
-    text-transform: uppercase;
-    display: inline-block;
-    padding: 5px 15px;
-    transform: rotate(1deg);
-    box-shadow: 4px 4px 0 rgba(255,255,255,0.3);
-    margin: 5px;
-}
+/* --- SCREEN LOGIC --- */
+.screen { display: none; width: 90%; max-width: 800px; margin: auto; }
 
-.screen { 
-    display: none; 
-    width: 90%; 
-    max-width: 800px; 
-    margin: auto; 
-    /* Remove fixed height 100vh from here so login looks normal */
-}
+/* Standard screens (Login, Results) */
+.screen.active { display: block; }
 
-/* We only want the GAME screen to be full height */
-#gameScreen.active { 
+/* Layout-heavy screens (Game, Water Cooler, Voting) */
+#gameScreen.active, #lobbyScreen.active, #votingScreen.active { 
     display: flex; 
     flex-direction: column; 
-    height: 95vh; 
-    max-width: 1200px; /* Give the game more room than the login */
 }
 
-.active { display: block; } /* Standard screens just stack naturally */
-
-/* Fix the inputs and buttons so they don't stretch to 100% width */
-input { width: 300px; margin: 10px auto; display: block; }
-button { display: inline-block; width: auto; min-width: 200px; }
-/* --- GAME LAYOUT (The "No-Scroll" Fix) --- */
-.game-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    padding: 10px;
-    box-sizing: border-box;
+#gameScreen.active {
+    height: 95vh;
+    max-width: 1200px;
 }
 
+/* --- GAME LAYOUT --- */
+.game-container { padding: 10px; box-sizing: border-box; }
 .game-header { flex: 0 0 auto; }
-
-.workspace {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    min-height: 0; /* Allows children to scroll instead of page */
-}
+.workspace { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
 
 #corkboard {
     flex: 1;
@@ -95,11 +66,11 @@ button { display: inline-block; width: auto; min-width: 200px; }
     justify-content: center;
     align-content: center;
     gap: 10px;
-    overflow-y: auto; /* Scroll only inside the corkboard if needed */
+    overflow-y: auto;
 }
 
 .scraps-drawer {
-    flex: 0 0 30%; /* Takes bottom 30% of screen */
+    flex: 0 0 35%; 
     background: rgba(0,0,0,0.1);
     border-top: 4px double #5d4037;
     display: flex;
@@ -109,7 +80,7 @@ button { display: inline-block; width: auto; min-width: 200px; }
 
 #wordBank {
     flex: 1;
-    overflow-y: auto; /* This makes the office scraps scrollable! */
+    overflow-y: auto;
     padding: 15px;
     display: flex;
     flex-wrap: wrap;
@@ -149,27 +120,11 @@ button { display: inline-block; width: auto; min-width: 200px; }
 .bubbler-base { width: 60px; height: 30px; background: #e0e0e0; border: 2px solid #999; }
 @keyframes bubble { 0%, 100% { height: 60%; } 50% { height: 68%; } }
 
-/* --- OTHER UI --- */
-.staff-board {
-    background: #fff; padding: 15px; border: 6px solid #5d4037;
-    box-shadow: 5px 5px 15px rgba(0,0,0,0.3); margin: 10px auto; transform: rotate(-1deg);
-}
-
-.notice-box { font-size: 1.1rem; background:#fff; display:inline-block; padding:10px; border: 2px solid #000; transform: rotate(1deg); }
-
-.timer { font-size: 3rem; color: #d32f2f; font-family: 'Abril Fatface', cursive; }
-
-.prompt-box { 
-    background: #111; color: #fff; padding: 15px; font-size: 1.2rem;
-    clip-path: polygon(0% 0%, 100% 2%, 98% 100%, 2% 98%);
-}
-
-button {
-    padding: 10px 20px; font-family: 'Oswald', sans-serif; text-transform: uppercase;
-    background: #222; color: #fff; border: none; cursor: pointer;
-    box-shadow: 4px 4px 0 #999; margin: 5px;
-}
+/* --- UI ELEMENTS --- */
+.notice-box { font-size: 1.1rem; background:#fff; display:inline-block; padding:15px; border: 2px solid #000; transform: rotate(1deg); max-width: 600px; margin: 0 auto;}
+input { width: 300px; margin: 15px auto; padding: 12px; font-family: 'Special Elite'; border: 3px solid #111; }
+button { padding: 10px 25px; font-family: 'Oswald'; background: #222; color: #fff; border: none; cursor: pointer; box-shadow: 4px 4px 0 #999; margin: 10px; width: fit-content; align-self: center; }
 button:hover { transform: translateY(-2px); box-shadow: 6px 6px 0 #999; }
-
+.timer { font-size: 3rem; color: #d32f2f; font-family: 'Abril Fatface'; }
+.prompt-box { background: #111; color: #fff; padding: 15px; font-size: 1.2rem; clip-path: polygon(0% 0%, 100% 2%, 98% 100%, 2% 98%); }
 .host-only { display: none; }
-.corkboard-placeholder { color:rgba(255,255,255,0.6); font-style:italic; }

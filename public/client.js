@@ -44,13 +44,20 @@ function joinGame() {
     const name = document.getElementById('username').value;
     if(name) {
         socket.emit('joinGame', name);
-        // We switch the screen immediately or wait for 'updateLobby'
+        // Switch to the water cooler immediately while waiting for server confirmation
         showScreen('lobbyScreen'); 
     }
 }
 
-socket.on('joinError', (msg) => {
-    alert(msg);
+// Ensure this matches your server's event name
+socket.on('gameStarted', (data) => {
+    console.log("Game starting..."); // Debug line
+    showScreen('gameScreen');
+    document.getElementById('promptText').textContent = data.prompt;
+    document.getElementById('timer').textContent = data.time;
+    
+    // Safety check: make sure word bank is visible
+    document.getElementById('wordBank').style.display = 'flex';
 });
 
 function startGame() {

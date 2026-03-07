@@ -1,17 +1,21 @@
-/* --- GLOBAL --- */
+/* --- GLOBAL (Updated for No-Scroll) --- */
 body { 
     font-family: 'Special Elite', monospace; 
     background-color: #d8cba0;
     background-image: url('https://www.transparenttextures.com/patterns/crumpled-paper.png');
     text-align: center; 
     margin: 0; 
-    padding: 20px;
+    padding: 0; /* Changed to 0 to help layout */
     color: #333;
+    overflow: hidden; /* Prevents whole page scrolling */
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 h1 { 
     font-family: 'Abril Fatface', cursive; 
-    font-size: 3.5rem; 
+    font-size: 3rem; 
     letter-spacing: 2px;
     color: #111;
     text-transform: uppercase; 
@@ -21,7 +25,7 @@ h1 {
     clip-path: polygon(3% 0%, 97% 5%, 100% 85%, 95% 100%, 5% 95%, 0% 10%);
     box-shadow: 10px 10px 0 rgba(0,0,0,0.8); 
     transform: rotate(-3deg); 
-    margin-bottom: 20px;
+    margin: 10px 0;
 }
 
 h3 {
@@ -33,200 +37,125 @@ h3 {
     padding: 5px 15px;
     transform: rotate(1deg);
     box-shadow: 4px 4px 0 rgba(255,255,255,0.3);
+    margin: 5px;
 }
 
-.screen { display: none; max-width: 900px; margin: 0 auto; }
-.active { display: block; }
+.screen { 
+    display: none; 
+    width: 100%; 
+    max-width: 900px; 
+    margin: 0 auto; 
+    height: 100vh; 
+}
+.active { display: flex; flex-direction: column; }
+
+/* --- GAME LAYOUT (The "No-Scroll" Fix) --- */
+.game-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.game-header { flex: 0 0 auto; }
+
+.workspace {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Allows children to scroll instead of page */
+}
+
+#corkboard {
+    flex: 1;
+    background-color: #6d4c41; 
+    background-image: url('https://www.transparenttextures.com/patterns/cork-board.png');
+    border: 15px solid #3e2723;
+    border-radius: 8px;
+    box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+    padding: 20px;
+    margin: 5px 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+    gap: 10px;
+    overflow-y: auto; /* Scroll only inside the corkboard if needed */
+}
+
+.scraps-drawer {
+    flex: 0 0 30%; /* Takes bottom 30% of screen */
+    background: rgba(0,0,0,0.1);
+    border-top: 4px double #5d4037;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+#wordBank {
+    flex: 1;
+    overflow-y: auto; /* This makes the office scraps scrollable! */
+    padding: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');
+}
 
 /* --- THE MAGNETS --- */
 .magnet {
     display: inline-block;
-    padding: 8px 15px;
-    margin: 8px;
+    padding: 6px 12px;
+    margin: 5px;
     cursor: grab;
-    user-select: none;
+    font-size: 0.9rem;
     box-shadow: 3px 3px 5px rgba(0,0,0,0.4);
-    transition: transform 0.1s, box-shadow 0.1s;
     position: relative;
+    transition: transform 0.1s;
 }
 
 .magnet::after {
-    content: '';
-    position: absolute;
-    top: -5px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 8px;
-    height: 8px;
-    background: radial-gradient(circle at 30% 30%, #e0e0e0, #888);
-    border-radius: 50%;
-    box-shadow: 1px 1px 2px rgba(0,0,0,0.6);
-    pointer-events: none;
+    content: ''; position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+    width: 6px; height: 6px; background: radial-gradient(circle at 30% 30%, #e0e0e0, #888);
+    border-radius: 50%; box-shadow: 1px 1px 2px rgba(0,0,0,0.6);
 }
-
-.magnet:hover { 
-    transform: scale(1.1) rotate(0deg) !important; 
-    z-index: 100;
-    box-shadow: 15px 15px 25px rgba(0,0,0,0.5);
-}
-.magnet:active { cursor: grabbing; transform: scale(0.9); }
 
 /* --- WATER BUBBLER --- */
-.water-bubbler {
-    width: 60px;
-    margin: 20px auto;
-    position: relative;
-}
-
+.water-bubbler { width: 60px; margin: 10px auto; position: relative; }
 .bubbler-tank {
-    width: 50px;
-    height: 70px;
-    background: rgba(173, 216, 230, 0.6); /* Translucent blue */
-    border-radius: 10px 10px 2px 2px;
-    border: 2px solid #999;
-    position: relative;
-    overflow: hidden;
+    width: 50px; height: 70px; background: rgba(173, 216, 230, 0.6);
+    border-radius: 10px 10px 2px 2px; border: 2px solid #999;
+    position: relative; overflow: hidden;
 }
-
-/* Water level animation */
 .bubbler-tank::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 60%;
-    background: rgba(0, 191, 255, 0.4);
-    animation: bubble 3s ease-in-out infinite;
+    content: ''; position: absolute; bottom: 0; width: 100%; height: 60%;
+    background: rgba(0, 191, 255, 0.4); animation: bubble 3s ease-in-out infinite;
 }
+.bubbler-base { width: 60px; height: 30px; background: #e0e0e0; border: 2px solid #999; }
+@keyframes bubble { 0%, 100% { height: 60%; } 50% { height: 68%; } }
 
-.bubbler-base {
-    width: 60px;
-    height: 40px;
-    background: #e0e0e0;
-    border: 2px solid #999;
-    border-radius: 2px;
-}
-
-@keyframes bubble {
-    0%, 100% { height: 60%; }
-    50% { height: 65%; }
-}
-
-/* --- STAFF BOARD --- */
+/* --- OTHER UI --- */
 .staff-board {
-    background: #fff;
-    padding: 20px;
-    border: 8px solid #5d4037; /* Picture frame look */
-    box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
-    max-width: 400px;
-    margin: 20px auto;
-    transform: rotate(-1deg);
+    background: #fff; padding: 15px; border: 6px solid #5d4037;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.3); margin: 10px auto; transform: rotate(-1deg);
 }
 
-/* --- CORKBOARD --- */
-#corkboard {
-    background-color: #6d4c41; 
-    background-image: url('https://www.transparenttextures.com/patterns/cork-board.png');
-    border: 25px solid #3e2723;
-    border-radius: 8px;
-    box-shadow: 
-        inset 0 0 50px rgba(0,0,0,0.8),
-        inset 2px 2px 5px rgba(0,0,0,0.5),
-        10px 10px 30px rgba(0,0,0,0.6);
-    padding: 40px;
-    min-height: 250px;
-    margin-bottom: 30px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    position: relative;
-}
+.notice-box { font-size: 1.1rem; background:#fff; display:inline-block; padding:10px; border: 2px solid #000; transform: rotate(1deg); }
 
-#corkboard::after {
-    content: 'DEPT. OF EVERYTHING';
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    font-size: 2.5rem;
-    color: rgba(50, 20, 0, 0.15);
-    font-family: 'Special Elite', cursive;
-    transform: rotate(-5deg);
-    pointer-events: none;
-    font-weight: bold;
-    border: 5px double rgba(50, 20, 0, 0.15);
-    padding: 5px 20px;
-}
+.timer { font-size: 3rem; color: #d32f2f; font-family: 'Abril Fatface', cursive; }
 
-#wordBank {
-    background-color: #e8d8b8;
-    background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');
-    padding: 25px;
-    border: 3px dashed #8c7b5d;
-    min-height: 250px;
-    transform: rotate(0.5deg);
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
-}
-
-/* --- UI ELEMENTS --- */
-.vote-card {
-    background: #fff;
-    border: 1px solid #ccc;
-    margin: 20px auto;
-    padding: 30px;
-    cursor: pointer;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-    max-width: 700px;
-    transform: rotate(-1deg);
-    transition: all 0.2s;
-    background-image: linear-gradient(#eee 1px, transparent 1px);
-    background-size: 100% 2em;
+.prompt-box { 
+    background: #111; color: #fff; padding: 15px; font-size: 1.2rem;
+    clip-path: polygon(0% 0%, 100% 2%, 98% 100%, 2% 98%);
 }
 
 button {
-    padding: 15px 30px;
-    font-size: 1.3rem;
-    font-family: 'Oswald', sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    background: #222;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    box-shadow: 6px 6px 0 #999;
-    transform: rotate(-1deg);
-    margin: 10px;
+    padding: 10px 20px; font-family: 'Oswald', sans-serif; text-transform: uppercase;
+    background: #222; color: #fff; border: none; cursor: pointer;
+    box-shadow: 4px 4px 0 #999; margin: 5px;
 }
-
-button:hover { top: -2px; box-shadow: 8px 8px 0 #999; background: #000; position: relative; }
-
-input { 
-    padding: 15px; font-size: 1.2rem; 
-    border: 4px solid #111; 
-    background: #fff; font-family: 'Special Elite', monospace;
-}
-
-.timer { font-size: 4rem; color: #d32f2f; font-family: 'Abril Fatface', cursive; margin: 10px 0; text-shadow: 2px 2px 0 #fff; }
-
-.prompt-box { 
-    background: #111; 
-    color: #fff; 
-    padding: 20px; 
-    font-size: 1.5rem; 
-    font-family: 'Special Elite', monospace;
-    margin: 0 auto 30px auto;
-    max-width: 800px;
-    clip-path: polygon(0% 0%, 100% 2%, 98% 100%, 2% 98%);
-    transform: rotate(-1deg);
-}
+button:hover { transform: translateY(-2px); box-shadow: 6px 6px 0 #999; }
 
 .host-only { display: none; }
-
-/* Helpers from HTML removal */
-.notice-box { font-size: 1.3rem; background:#fff; display:inline-block; padding:15px; transform:rotate(1deg); border: 2px solid #000; max-width: 700px; }
-#startBtn { background:#2e7d32; box-shadow: 6px 6px 0 #1b5e20; }
-.btn-resolve { margin-bottom:25px; background:#d32f2f; box-shadow: 6px 6px 0 #8b0000; }
-.ui-subtext { background:#fff; display:inline-block; padding:5px; }
-.corkboard-placeholder { color:rgba(255,255,255,0.8); font-style:italic; font-size: 1.4rem; background:rgba(0,0,0,0.6); padding: 10px; border-radius:5px; }
-.winning-note-container { padding: 40px; background: url('https://www.transparenttextures.com/patterns/cork-board.png'), #6d4c41; border: 20px solid #3e2723; box-shadow: inset 0 0 30px rgba(0,0,0,0.8); margin: 30px auto; max-width: 700px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; min-height: 150px; align-items: center; border-radius: 8px; }
+.corkboard-placeholder { color:rgba(255,255,255,0.6); font-style:italic; }

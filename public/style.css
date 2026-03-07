@@ -201,6 +201,31 @@ h1 {
     position: relative;
 }
 
+/* The APPROVED stamp look */
+.approved-stamp {
+    position: absolute;
+    bottom: 10px;
+    right: 20px;
+    border: 5px solid #d32f2f;
+    color: #d32f2f;
+    font-family: 'Oswald', sans-serif;
+    font-size: 2rem;
+    padding: 5px 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+    opacity: 0.8;
+    transform: rotate(-15deg);
+    pointer-events: none;
+    background: rgba(255,255,255,0.1);
+}
+
+/* Ensure the winning container handles the new absolute stamp */
+.winning-note-container {
+    position: relative; /* This allows the stamp to stay inside */
+    background: #fff; /* Paper look inside the corkboard frame */
+    padding: 20px;
+    border: 1px solid #ddd;
+}
 /* --- UI ELEMENTS --- */
 .notice-box { font-size: 1.1rem; background:#fff; display:inline-block; padding:15px; border: 2px solid #000; transform: rotate(1deg); max-width: 600px; margin: 0 auto;}
 input { width: 300px; margin: 15px auto; padding: 12px; font-family: 'Special Elite'; border: 3px solid #111; }

@@ -9,23 +9,33 @@
 </head>
 <body>
 
-    <div id="lobbyScreen" class="screen active">
-        <h1>BUDGET CUTS</h1>
-        <br>
-        <p class="notice-box">
-            <b>NOTICE:</b> Due to budget cuts, all other departments have been fired. 
-            <br>YOU must now answer ALL incoming tickets.
-            <br>(And we sold the keyboards, so use these magazine scraps).
-        </p>
-        <br><br>
-        <input type="text" id="username" placeholder="EMPLOYEE ID">
-        <br><br>
-        <button onclick="joinGame()">CLOCK IN</button>
-        <br><br>
-        <h3>AVAILABLE STAFF:</h3>
-        <ul id="lobbyList" style="list-style: none; padding: 0;"></ul>
-        <button id="startBtn" class="host-only" onclick="startGame()">OPEN TICKET QUEUE</button>
+<div id="loginScreen" class="screen active">
+    <h1>BUDGET CUTS</h1>
+    <div class="notice-box">
+        <b>NOTICE:</b> Due to budget cuts, all other departments have been fired. 
+        <br>YOU must now answer ALL incoming tickets.
     </div>
+    <br><br>
+    <input type="text" id="username" placeholder="EMPLOYEE ID">
+    <br><br>
+    <button onclick="joinGame()">CLOCK IN</button>
+</div>
+
+<div id="lobbyScreen" class="screen">
+    <h1>THE WATER COOLER</h1>
+    <div class="water-bubbler">
+        <div class="bubbler-tank"></div>
+        <div class="bubbler-base"></div>
+    </div>
+    <p>Waiting for the rest of the skeleton crew to arrive...</p>
+    
+    <div class="staff-board">
+        <h3>STAFF LOITERING:</h3>
+        <ul id="lobbyList" style="list-style: none; padding: 0;"></ul>
+    </div>
+
+    <button id="startBtn" class="host-only" onclick="startGame()">START SHIFT</button>
+</div>
 
     <div id="gameScreen" class="screen">
         <div class="timer" id="timer">90</div>

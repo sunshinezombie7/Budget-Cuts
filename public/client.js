@@ -207,11 +207,10 @@ function showScreen(id) {
     const target = document.getElementById(id);
     if(target) target.classList.add('active');
     
-    // Hide word bank if we are just loitering at the cooler
-    const wordBank = document.getElementById('wordBank');
+    // Manage body scrolling: only allow it on the lobby/results
     if(id === 'gameScreen') {
-         wordBank.style.display = 'block';
+        document.body.style.overflow = 'hidden';
     } else {
-         wordBank.style.display = 'none';
+        document.body.style.overflow = 'auto';
     }
 }

@@ -44,6 +44,8 @@ function joinGame() {
     const name = document.getElementById('username').value;
     if(name) {
         socket.emit('joinGame', name);
+        // We switch the screen immediately or wait for 'updateLobby'
+        showScreen('lobbyScreen'); 
     }
 }
 
@@ -202,9 +204,14 @@ socket.on('roundEnded', (data) => {
 
 function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+    const target = document.getElementById(id);
+    if(target) target.classList.add('active');
+    
+    // Hide word bank if we are just loitering at the cooler
     const wordBank = document.getElementById('wordBank');
-    if(id === 'lobbyScreen' || id === 'gameScreen') {
+    if(id === 'gameScreen') {
          wordBank.style.display = 'block';
+    } else {
+         wordBank.style.display = 'none';
     }
 }
